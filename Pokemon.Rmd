@@ -5,7 +5,7 @@ output: github_document
 ---
 
 ## Group Members
-Sergio Ozoria Ramirez (smo2147), Maria Beg (mb5357), Eman Ibrahim (ei2291)
+Sergio Ozoria Ramirez (smo2147), Maria Beg (mb5357), Eman Ibrahim (ei2291), and Spencer Riddell (swr2118)
 
 ## Title
 Gotta Graph’ Em All: Exploring Pokémon through Data Science
