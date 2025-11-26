@@ -26,15 +26,6 @@ poke_tidy = poke_tidy |>
   ) |> 
   distinct(name, .keep_all = TRUE)
 
-# serg - categorical var for plotting/modeling
-poke_tidy = poke_tidy |> 
-  mutate(
-    type1 = as.factor(type1),
-    type2 = as.factor(type2),
-    generation = as.factor(generation),
-    is_legendary = as.logical(is_legendary)
-  )
-
 # serg - cleaning up abilities (could also create variables for each)
 poke_tidy = poke_tidy |> 
   mutate(
@@ -45,6 +36,15 @@ poke_tidy = poke_tidy |>
 poke_tidy = poke_tidy |> 
   mutate(
     genderless = ifelse(is.na(percentage_male), TRUE, FALSE)
+  )
+
+# serg - categorical var for plotting/modeling
+poke_tidy = poke_tidy |> 
+  mutate(
+    type1 = factor(type1),
+    type2 = factor(type2),
+    generation = factor(generation),
+    is_legendary = as.logical(is_legendary)
   )
 ```
 
