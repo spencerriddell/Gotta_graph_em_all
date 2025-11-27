@@ -77,6 +77,80 @@ poke_tidy =
   mutate(offense_defense_ratio = attack / defense)
 ```
 
+```{r}
+# eman - starting with basic eda
+
+head(poke_tidy)
+
+ggplot(poke_tidy, aes(total_stats))+
+  geom_histogram(bins = 30, fill = "skyblue", color = "black")+
+  labs(title = "Distribution of Total Stats")
+```
+
+```{r}
+# eman - average total stats by type
+
+ggplot(poke_tidy, aes(type1, total_stats))+
+  geom_boxplot()+
+  coord_flip()+
+  labs(title = "Total Stats by Primary Type")
+```
+
+```{r}
+#eman - height vs weight colored by strength
+
+ggplot(poke_tidy, aes(height_m, weight_kg, color = total_stats))+
+  geom_point(alpha = 0.6, size =2)+
+  scale_color_viridis_c()+
+  labs(title = "Height vs Weight (Colored by total stats")
+```
+
+```{r}
+# eman - hypothesis testing
+# test 1: ANOVA - Do types differ in strength?
+# Null hypothesis: mean total stats are equal across all types
+
+anova_type = 
+  aov(total_stats ~ type1, data = poke_tidy)
+summary(anova_type)
+```
+
+
+```{r}
+# eman - hypothesis testing
+# test 2: t-test - Are legendary Pokemon stronger?
+# Null hypothesis:legendary and non-legendary pokemon have the same mean total stats
+
+t.test(total_stats ~ is_legendary, data = poke_tidy)
+```
+
+```{r}
+# eman - logistic regression (predicting legendary)
+
+legend_model =
+  glm (
+    is_legendary ~ total_stats + type1+ generation,
+    data = poke_tidy, 
+    family = "binomial"
+  )
+summary(legend_model)
+
+poke_tidy$predicted_legendary =
+  predict(legend_model, type = "response")
+
+```
+
+```{r}
+#eman - saving clean dataset
+
+write_csv(poke_tidy, "Data/pokemon_clean.csv")
+```
+
+
+
+
+
+
 
 
 
