@@ -11,10 +11,10 @@ library(tidyverse)
 
     ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
     ## ✔ dplyr     1.1.4     ✔ readr     2.1.5
-    ## ✔ forcats   1.0.0     ✔ stringr   1.5.1
-    ## ✔ ggplot2   3.5.2     ✔ tibble    3.3.0
+    ## ✔ forcats   1.0.1     ✔ stringr   1.5.2
+    ## ✔ ggplot2   4.0.0     ✔ tibble    3.3.0
     ## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-    ## ✔ purrr     1.0.4     
+    ## ✔ purrr     1.1.0     
     ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
     ## ✖ dplyr::filter() masks stats::filter()
     ## ✖ dplyr::lag()    masks stats::lag()
@@ -256,3 +256,140 @@ poke_tidy$predicted_legendary =
 
 write_csv(poke_tidy, "Data/pokemon_clean.csv")
 ```
+
+``` r
+library(randomForest)
+library(caret)
+
+#maria - Hypothesis testing
+
+# Can we predict Pokémon type from stats?
+
+poke_type <- poke_tidy |> 
+  select(type1, hp, attack, defense, sp_attack, sp_defense, speed) |> 
+  mutate(type1 = as.factor(type1))
+
+# 80/20 train-test split
+set.seed(123)
+
+train_index <- createDataPartition(poke_type[["type1"]], 
+                                   p = 0.8, list = FALSE)
+
+train_set <- poke_type[train_index, ]
+test_set  <- poke_type[-train_index, ]
+
+# Train Random Forest
+type_model = randomForest(type1 ~ ., data = train_set, ntree = 500)
+
+# Make predictions
+predictions = predict(type_model, newdata = test_set)
+
+# Accuracy
+accuracy = mean(predictions == test_set[[1]])
+baseline = 1/18
+improvement = accuracy - baseline
+
+# Results
+results = list(
+  Accuracy = round(accuracy * 100, 1),
+  Baseline = round(100/18, 1),
+  Improvement = round((accuracy - (1/18)) * 100, 1)
+)
+
+results
+```
+
+    ## $Accuracy
+    ## [1] 23.2
+    ## 
+    ## $Baseline
+    ## [1] 5.6
+    ## 
+    ## $Improvement
+    ## [1] 17.6
+
+``` r
+# Feature importance
+importance_scores = importance(type_model)
+varImpPlot(type_model, main = "Feature Importance for Type Prediction")
+```
+
+![](serg_working_file_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+
+``` r
+# Type-specific accuracy
+conf_matrix = table(test_set[["type1"]], predictions)
+
+type_accuracy = diag(conf_matrix) / rowSums(conf_matrix)
+
+type_accuracy_df <- data.frame(
+  Type = names(type_accuracy),
+  Accuracy = round(type_accuracy * 100, 1)
+) |> 
+  arrange(desc(Accuracy)) |> 
+  na.omit()
+
+
+# Visualization for Prediction Accuracy
+ggplot(type_accuracy_df, 
+       aes(x = reorder(Type, Accuracy), 
+           y = Accuracy)) +
+  geom_col(aes(fill = Accuracy > 23.2)) +
+  geom_hline(yintercept = 23.2, linetype = "dashed", color = "red") + 
+  coord_flip() +
+  scale_fill_manual(
+    values = c("TRUE" = "steelblue", "FALSE" = "gray"),
+    labels = c("Below average", "Above average"),
+    name = "Type performance"
+  ) +
+  labs(
+    title = "Random Forest: Type-Specific Prediction Accuracy",
+    subtitle = "Accuracy (%) for each Pokémon primary type (test set)",
+    x = "Pokémon Type",
+    y = "Accuracy (%)"
+  ) +
+  theme_bw()+
+theme(legend.position = "bottom")
+```
+
+![](serg_working_file_files/figure-gfm/unnamed-chunk-12-2.png)<!-- -->
+
+The Random Forest model achieved 23.2% accuracy in predicting Pokémon
+primary type from base stats alone—4.1 times better than the 5.6%
+baseline expected from random guessing across 18 types. This represents
+a 17.6 percentage-point improvement and narrowly approaches our 25%
+stretch target, demonstrating that Pokémon stats do contain meaningful
+type-specific patterns.
+
+Types with 0% accuracy likely had very small sample sizes in the test
+set (1-2 Pokémon), making them vulnerable to misclassification. This
+highlights a limitation of our dataset size for rare type categories.
+
+Surprisingly, Normal type was most predictable (61.9%), possibly because
+its balanced, middle-range stat profile is distinctive compared to the
+more specialized distributions of other types.
+
+## HYPOTHESIS TEST CONCLUSION:
+
+We REJECT the null hypothesis (H₀). The model’s performance exceeds
+baseline, providing evidence that Pokémon primary types differ
+systematically in their stat distributions.
+
+Variable importance analysis reveals that Special Attack, Attack and
+Speed are the strongest type predictors. This suggests offensive
+capabilities and speed tiers are more type-distinctive than defensive
+stats—consistent with Pokémon battle mechanics where types often
+specialize in offensive roles (e.g., Fighting types favor high Attack,
+Psychic types favor Special Attack).
+
+Type-specific accuracy varied substantially. The easiest types to
+predict were Normal (61.9%), Fighting (40%), and Fire (40%), likely
+because these types have distinctive stat profiles. In contrast, several
+types such as Fairy, Ghost, Ground, Ice, Poison, and Rock had 0%
+accuracy, reflecting high overlap in stat distributions with other
+types. This explains why the overall model accuracy (~23%) is moderate,
+many Pokémon share similar stats despite different types.
+
+From a gameplay perspective, base stats provide useful but incomplete
+information about type identity. Players should consider both stat
+distributions and type matchups when building balanced teams.
