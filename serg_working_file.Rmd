@@ -52,7 +52,7 @@ poke_tidy = poke_tidy |>
 ```{r}
 # eman - convert  numeric columns
 
-poke_tidy=
+poke_tidy =
   poke_tidy |> 
   mutate(across(
     .cols = c(starts_with("against_"), "hp", "attack", "defense", "sp_attack", "sp_defense", "speed", "height_m", "weight_kg", "base_total"),
@@ -245,6 +245,87 @@ Type-specific accuracy varied substantially. The easiest types to predict were N
 
 From a gameplay perspective, base stats provide useful but incomplete information about type identity. Players should consider both stat distributions and type matchups when building balanced teams.
 
+
+```{r}
+# Serg - Hypothesis testing using linear regression
+  # RQ: Is there a relationship between capture rate and overall combat effectiveness?
+
+# serg - selecting analytic sample + covariates
+
+library(gtsummary)
+library(sjPlot)
+
+capture_stats = poke_tidy |> 
+  mutate(
+    capture_rate = as.numeric(capture_rate),
+    percentage_male = as.numeric(percentage_male),
+    generation = as.factor(generation)
+  ) |> 
+  filter(
+    is_legendary == FALSE,
+    if_all(c(capture_rate, base_total, height_m, 
+             percentage_male, weight_kg, generation), ~ !is.na(.x))
+  )
+  
+# running linear regression model
+
+capture_stats_lm = lm(
+  base_total ~ capture_rate + height_m + 
+    weight_kg + percentage_male + generation,
+  data = capture_stats
+)
+
+summary(capture_stats_lm)
+
+tbl_regression(
+  capture_stats_lm,
+  intercept = TRUE,
+  estimate_fun = ~ style_number(.x, digits = 2),
+  pvalue_fun = ~ style_pvalue(.x),
+  label = list(
+    capture_rate ~ "Capture Rate",
+    height_m ~ "Height (m)",
+    weight_kg ~ "Weight (kg)",
+    percentage_male ~ "Percentage Male",
+    generation ~ "Generation"
+  )
+) |> 
+  modify_header(label = "**Predictors**")
+```
+
+## Capture Rate vs Performance Analysis
+
+As Pokémon data nerds, we were interested in examining whether a Pokemon's capture rate is related to its overall combat potential, which is relevant information for casual Pokémon players and competitive trainers. Thus, we examined whether Pokémon that are harder to catch tend to have higher base stat totals. 
+
+Our conceptual hypothesis is that performance contributes to capture difficulty, meaning that stronger Pokémon are designed to be more challenging to catch. To evaluate this relationship, we tested the following hypotheses:
+
+* H₀: There is no linear relationship between `capture_rate` and `total_stats` among non-legendary Pokémon, after accounting for key demographic variables
+
+* H₁: There is a significant negative relationship between `capture_rate` and `total_stats` (harder-to-catch Pokémon tend to be stronger), after accounting for key demographic variables
+
+#### Measures
+
+* Exposure (predictor):`capture_rate` represents how easy a Pokémon can be caught, meaning that higher values = easier to catch. This variable was cleaned and recoded as a numeric, continuous variable to correctly model the linear relationship and test our hypothesis.
+
+* Outcome (dependent): `base_total` is the sum of a Pokemon's six base total stats, including `hp`, `attack`, `defense`, `sp_attack`, `sp_defense`, and `speed`. This variable will serve as a proxy to assess overall combat effectiveness.  
+
+#### Covariates
+
+Several species-characteristics were included as covariates in the linear regression model to address potential confounding and improve model precision.
+These variables were chosen based on their plausible relationships with both `capture_rate` (main predictor) and `base_total` (main outcome of interest), as well as their relevancy to the universe design and any other factors that could bias our results. These covariates included:
+
+* `height_m`: This represents the physical size of the Pokémon. This variable was selected as a covariate because larger species could exhibit higher base stats and may have lower capture rates, making height a potential confounder. 
+* `weight_kg`: This represents the body mass index of the Pokémon. This variable was selected as a covariate because heavier Pokémon could have higher combat stats, as well as influence catch rate difficulty.
+* `percentage_male`: This represents the proportion of male species in the dataset.Some species may have sex-based differences when it comes to stats, so sex distribution could correlate with combat potential. This variable also helps account for any sex/gender related differences. 
+* `generation`: This represents the generation in which the Pokémon was first introduced. This variable was accounted for, as adjusting for it could control for systematic differences across generations due to temporal decision-making around stats or design based on generation.
+
+Altogether, these covariates are meant to adjust for any potential differences across species, reduce biased estimates, and isolate the association between capture rate and overall base stats to assess combat effectiveness.
+
+#### Interpretation of regression analysis
+
+Among all non-legendary Pokémon included our cross-generational dataset of the Pokémon universe, we observed a significant negative association between `capture_rate` and `base_total`. More specifically, for every one-unit increase in `capture_rate`, meaning easier to catch, `base_total` decreased by about 0.87 points **(β = −0.87, 95% CI: −0.96, −0.79; p < 0.001)**. These results suggest that species designed to be harder to catch tend to possess higher combat power than those who are easier to catch.
+
+At the 5% significance level, the association between `capture_rate` and `base_total` is statistically significant, after adjusting for `height_m`, `weight_kg`, `percentage_male`, and `generation`. Therefore, we reject the null hypothesis that there is no linear relationship between the exposure and outcome of interest. 
 
 
 

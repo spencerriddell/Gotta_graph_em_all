@@ -11,10 +11,10 @@ library(tidyverse)
 
     ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
     ## ✔ dplyr     1.1.4     ✔ readr     2.1.5
-    ## ✔ forcats   1.0.1     ✔ stringr   1.5.2
+    ## ✔ forcats   1.0.1     ✔ stringr   1.6.0
     ## ✔ ggplot2   4.0.0     ✔ tibble    3.3.0
     ## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-    ## ✔ purrr     1.1.0     
+    ## ✔ purrr     1.2.0     
     ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
     ## ✖ dplyr::filter() masks stats::filter()
     ## ✖ dplyr::lag()    masks stats::lag()
@@ -70,7 +70,7 @@ poke_tidy = poke_tidy |>
 ``` r
 # eman - convert  numeric columns
 
-poke_tidy=
+poke_tidy =
   poke_tidy |> 
   mutate(across(
     .cols = c(starts_with("against_"), "hp", "attack", "defense", "sp_attack", "sp_defense", "speed", "height_m", "weight_kg", "base_total"),
@@ -393,3 +393,646 @@ many Pokémon share similar stats despite different types.
 From a gameplay perspective, base stats provide useful but incomplete
 information about type identity. Players should consider both stat
 distributions and type matchups when building balanced teams.
+
+``` r
+# Serg - Hypothesis testing using linear regression
+  # RQ: Is there a relationship between capture rate and overall combat effectiveness?
+
+# serg - selecting analytic sample + covariates
+
+library(gtsummary)
+library(sjPlot)
+```
+
+    ## 
+    ## Attaching package: 'sjPlot'
+
+    ## The following object is masked from 'package:ggplot2':
+    ## 
+    ##     set_theme
+
+``` r
+capture_stats = poke_tidy |> 
+  mutate(
+    capture_rate = as.numeric(capture_rate),
+    percentage_male = as.numeric(percentage_male),
+    generation = as.factor(generation)
+  ) |> 
+  filter(
+    is_legendary == FALSE,
+    if_all(c(capture_rate, base_total, height_m, 
+             percentage_male, weight_kg, generation), ~ !is.na(.x))
+  )
+```
+
+    ## Warning: There was 1 warning in `mutate()`.
+    ## ℹ In argument: `capture_rate = as.numeric(capture_rate)`.
+    ## Caused by warning:
+    ## ! NAs introduced by coercion
+
+``` r
+# running linear regression model
+
+capture_stats_lm = lm(
+  base_total ~ capture_rate + height_m + 
+    weight_kg + percentage_male + generation,
+  data = capture_stats
+)
+
+summary(capture_stats_lm)
+```
+
+    ## 
+    ## Call:
+    ## lm(formula = base_total ~ capture_rate + height_m + weight_kg + 
+    ##     percentage_male + generation, data = capture_stats)
+    ## 
+    ## Residuals:
+    ##      Min       1Q   Median       3Q      Max 
+    ## -309.322  -38.150    2.406   36.602  256.354 
+    ## 
+    ## Coefficients:
+    ##                  Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)     489.68579   13.31805  36.769  < 2e-16 ***
+    ## capture_rate     -0.87326    0.04189 -20.845  < 2e-16 ***
+    ## height_m         19.67798    3.82884   5.139 3.63e-07 ***
+    ## weight_kg         0.25079    0.04899   5.120 4.01e-07 ***
+    ## percentage_male  -0.38340    0.14045  -2.730  0.00651 ** 
+    ## generation2     -17.14558    9.80499  -1.749  0.08081 .  
+    ## generation3       6.05691    9.19402   0.659  0.51026    
+    ## generation4       0.29133    9.98233   0.029  0.97673    
+    ## generation5      11.38990    8.85836   1.286  0.19897    
+    ## generation6      11.71550   10.90702   1.074  0.28316    
+    ## generation7      -3.39071   11.42065  -0.297  0.76664    
+    ## ---
+    ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+    ## 
+    ## Residual standard error: 70.4 on 666 degrees of freedom
+    ## Multiple R-squared:  0.5684, Adjusted R-squared:  0.5619 
+    ## F-statistic:  87.7 on 10 and 666 DF,  p-value: < 2.2e-16
+
+``` r
+tbl_regression(
+  capture_stats_lm,
+  intercept = TRUE,
+  estimate_fun = ~ style_number(.x, digits = 2),
+  pvalue_fun = ~ style_pvalue(.x),
+  label = list(
+    capture_rate ~ "Capture Rate",
+    height_m ~ "Height (m)",
+    weight_kg ~ "Weight (kg)",
+    percentage_male ~ "Percentage Male",
+    generation ~ "Generation"
+  )
+) |> 
+  modify_header(label = "**Predictors**")
+```
+
+<div id="rvgozboszc" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#rvgozboszc table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+&#10;#rvgozboszc thead, #rvgozboszc tbody, #rvgozboszc tfoot, #rvgozboszc tr, #rvgozboszc td, #rvgozboszc th {
+  border-style: none;
+}
+&#10;#rvgozboszc p {
+  margin: 0;
+  padding: 0;
+}
+&#10;#rvgozboszc .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+&#10;#rvgozboszc .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+&#10;#rvgozboszc .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+&#10;#rvgozboszc .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+&#10;#rvgozboszc .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+&#10;#rvgozboszc .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+&#10;#rvgozboszc .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+&#10;#rvgozboszc .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+&#10;#rvgozboszc .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+&#10;#rvgozboszc .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+&#10;#rvgozboszc .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+&#10;#rvgozboszc .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+&#10;#rvgozboszc .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+&#10;#rvgozboszc .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+&#10;#rvgozboszc .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+&#10;#rvgozboszc .gt_from_md > :first-child {
+  margin-top: 0;
+}
+&#10;#rvgozboszc .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+&#10;#rvgozboszc .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+&#10;#rvgozboszc .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+&#10;#rvgozboszc .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+&#10;#rvgozboszc .gt_row_group_first td {
+  border-top-width: 2px;
+}
+&#10;#rvgozboszc .gt_row_group_first th {
+  border-top-width: 2px;
+}
+&#10;#rvgozboszc .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+&#10;#rvgozboszc .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+&#10;#rvgozboszc .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+&#10;#rvgozboszc .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+&#10;#rvgozboszc .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+&#10;#rvgozboszc .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+&#10;#rvgozboszc .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+&#10;#rvgozboszc .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+&#10;#rvgozboszc .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+&#10;#rvgozboszc .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+&#10;#rvgozboszc .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+&#10;#rvgozboszc .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+&#10;#rvgozboszc .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+&#10;#rvgozboszc .gt_left {
+  text-align: left;
+}
+&#10;#rvgozboszc .gt_center {
+  text-align: center;
+}
+&#10;#rvgozboszc .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+&#10;#rvgozboszc .gt_font_normal {
+  font-weight: normal;
+}
+&#10;#rvgozboszc .gt_font_bold {
+  font-weight: bold;
+}
+&#10;#rvgozboszc .gt_font_italic {
+  font-style: italic;
+}
+&#10;#rvgozboszc .gt_super {
+  font-size: 65%;
+}
+&#10;#rvgozboszc .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+&#10;#rvgozboszc .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+&#10;#rvgozboszc .gt_indent_1 {
+  text-indent: 5px;
+}
+&#10;#rvgozboszc .gt_indent_2 {
+  text-indent: 10px;
+}
+&#10;#rvgozboszc .gt_indent_3 {
+  text-indent: 15px;
+}
+&#10;#rvgozboszc .gt_indent_4 {
+  text-indent: 20px;
+}
+&#10;#rvgozboszc .gt_indent_5 {
+  text-indent: 25px;
+}
+&#10;#rvgozboszc .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+&#10;#rvgozboszc div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="label"><span class='gt_from_md'><strong>Predictors</strong></span></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="estimate"><span class='gt_from_md'><strong>Beta</strong></span></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="conf.low"><span class='gt_from_md'><strong>95% CI</strong></span></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="p.value"><span class='gt_from_md'><strong>p-value</strong></span></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="label" class="gt_row gt_left">(Intercept)</td>
+<td headers="estimate" class="gt_row gt_center">489.69</td>
+<td headers="conf.low" class="gt_row gt_center">463.54, 515.84</td>
+<td headers="p.value" class="gt_row gt_center"><0.001</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">Capture Rate</td>
+<td headers="estimate" class="gt_row gt_center">-0.87</td>
+<td headers="conf.low" class="gt_row gt_center">-0.96, -0.79</td>
+<td headers="p.value" class="gt_row gt_center"><0.001</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">Height (m)</td>
+<td headers="estimate" class="gt_row gt_center">19.68</td>
+<td headers="conf.low" class="gt_row gt_center">12.16, 27.20</td>
+<td headers="p.value" class="gt_row gt_center"><0.001</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">Weight (kg)</td>
+<td headers="estimate" class="gt_row gt_center">0.25</td>
+<td headers="conf.low" class="gt_row gt_center">0.15, 0.35</td>
+<td headers="p.value" class="gt_row gt_center"><0.001</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">Percentage Male</td>
+<td headers="estimate" class="gt_row gt_center">-0.38</td>
+<td headers="conf.low" class="gt_row gt_center">-0.66, -0.11</td>
+<td headers="p.value" class="gt_row gt_center">0.007</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">Generation</td>
+<td headers="estimate" class="gt_row gt_center"><br /></td>
+<td headers="conf.low" class="gt_row gt_center"><br /></td>
+<td headers="p.value" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    1</td>
+<td headers="estimate" class="gt_row gt_center">—</td>
+<td headers="conf.low" class="gt_row gt_center">—</td>
+<td headers="p.value" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    2</td>
+<td headers="estimate" class="gt_row gt_center">-17.15</td>
+<td headers="conf.low" class="gt_row gt_center">-36.40, 2.11</td>
+<td headers="p.value" class="gt_row gt_center">0.081</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    3</td>
+<td headers="estimate" class="gt_row gt_center">6.06</td>
+<td headers="conf.low" class="gt_row gt_center">-12.00, 24.11</td>
+<td headers="p.value" class="gt_row gt_center">0.5</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    4</td>
+<td headers="estimate" class="gt_row gt_center">0.29</td>
+<td headers="conf.low" class="gt_row gt_center">-19.31, 19.89</td>
+<td headers="p.value" class="gt_row gt_center">>0.9</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    5</td>
+<td headers="estimate" class="gt_row gt_center">11.39</td>
+<td headers="conf.low" class="gt_row gt_center">-6.00, 28.78</td>
+<td headers="p.value" class="gt_row gt_center">0.2</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    6</td>
+<td headers="estimate" class="gt_row gt_center">11.72</td>
+<td headers="conf.low" class="gt_row gt_center">-9.70, 33.13</td>
+<td headers="p.value" class="gt_row gt_center">0.3</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    7</td>
+<td headers="estimate" class="gt_row gt_center">-3.39</td>
+<td headers="conf.low" class="gt_row gt_center">-25.82, 19.03</td>
+<td headers="p.value" class="gt_row gt_center">0.8</td></tr>
+  </tbody>
+  <tfoot>
+    <tr class="gt_sourcenotes">
+      <td class="gt_sourcenote" colspan="4"><span class='gt_from_md'>Abbreviation: CI = Confidence Interval</span></td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+
+## Capture Rate vs Performance Analysis
+
+As Pokémon data nerds, we were interested in examining whether a
+Pokemon’s capture rate is related to its overall combat potential, which
+is relevant information for casual Pokémon players and competitive
+trainers. Thus, we examined whether Pokémon that are harder to catch
+tend to have higher base stat totals.
+
+Our conceptual hypothesis is that performance contributes to capture
+difficulty, meaning that stronger Pokémon are designed to be more
+challenging to catch. To evaluate this relationship, we tested the
+following hypotheses:
+
+- H₀: There is no linear relationship between `capture_rate` and
+  `total_stats` among non-legendary Pokémon, after accounting for key
+  demographic variables
+
+- H₁: There is a significant negative relationship between
+  `capture_rate` and `total_stats` (harder-to-catch Pokémon tend to be
+  stronger), after accounting for key demographic variables
+
+#### Measures
+
+- Exposure (predictor):`capture_rate` represents how easy a Pokémon can
+  be caught, meaning that higher values = easier to catch. This variable
+  was cleaned and recoded as a numeric, continuous variable to correctly
+  model the linear relationship and test our hypothesis.
+
+- Outcome (dependent): `base_total` is the sum of a Pokemon’s six base
+  total stats, including `hp`, `attack`, `defense`, `sp_attack`,
+  `sp_defense`, and `speed`. This variable will serve as a proxy to
+  assess overall combat effectiveness.
+
+#### Covariates
+
+Several species-characteristics were included as covariates in the
+linear regression model to address potential confounding and improve
+model precision. These variables were chosen based on their plausible
+relationships with both `capture_rate` (main predictor) and `base_total`
+(main outcome of interest), as well as their relevancy to the universe
+design and any other factors that could bias our results. These
+covariates included:
+
+- `height_m`: This represents the physical size of the Pokémon. This
+  variable was selected as a covariate because larger species could
+  exhibit higher base stats and may have lower capture rates, making
+  height a potential confounder.
+- `weight_kg`: This represents the body mass index of the Pokémon. This
+  variable was selected as a covariate because heavier Pokémon could
+  have higher combat stats, as well as influence catch rate difficulty.
+- `percentage_male`: This represents the proportion of male species in
+  the dataset.Some species may have sex-based differences when it comes
+  to stats, so sex distribution could correlate with combat potential.
+  This variable also helps account for any sex/gender related
+  differences.
+- `generation`: This represents the generation in which the Pokémon was
+  first introduced. This variable was accounted for, as adjusting for it
+  could control for systematic differences across generations due to
+  temporal decision-making around stats or design based on generation.
+
+Altogether, these covariates are meant to adjust for any potential
+differences across species, reduce biased estimates, and isolate the
+association between capture rate and overall base stats to assess combat
+effectiveness.
+
+#### Interpretation of regression analysis
+
+Among all non-legendary Pokémon included our cross-generational dataset
+of the Pokémon universe, we observed a significant negative association
+between `capture_rate` and `base_total`. More specifically, for every
+one-unit increase in `capture_rate`, meaning easier to catch,
+`base_total` decreased by about 0.87 points **(β = −0.87, 95% CI: −0.96,
+−0.79; p \< 0.001)**. These results suggest that species designed to be
+harder to catch tend to possess higher combat power than those who are
+easier to catch.
+
+At the 5% significance level, the association between `capture_rate` and
+`base_total` is statistically significant, after adjusting for
+`height_m`, `weight_kg`, `percentage_male`, and `generation`. Therefore,
+we reject the null hypothesis that there is no linear relationship
+between the exposure and outcome of interest.
