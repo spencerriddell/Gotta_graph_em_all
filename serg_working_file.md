@@ -1,4 +1,4 @@
-Serg’s Project Working File
+Project Working File
 ================
 Sergio Ozoria
 2025-11-26
@@ -19,6 +19,50 @@ library(tidyverse)
     ## ✖ dplyr::filter() masks stats::filter()
     ## ✖ dplyr::lag()    masks stats::lag()
     ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+
+``` r
+library(scales)
+```
+
+    ## 
+    ## Attaching package: 'scales'
+    ## 
+    ## The following object is masked from 'package:purrr':
+    ## 
+    ##     discard
+    ## 
+    ## The following object is masked from 'package:readr':
+    ## 
+    ##     col_factor
+
+``` r
+library(viridis)
+```
+
+    ## Loading required package: viridisLite
+    ## 
+    ## Attaching package: 'viridis'
+    ## 
+    ## The following object is masked from 'package:scales':
+    ## 
+    ##     viridis_pal
+
+``` r
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_colour_viridis
+```
 
 ``` r
 #  serg - cleaning up name using snake format + concatenating missing values 
@@ -123,7 +167,7 @@ ggplot(poke_tidy, aes(total_stats))+
   labs(title = "Distribution of Total Stats")
 ```
 
-![](serg_working_file_files/figure-gfm/unnamed-chunk-5-1.png)<!-- -->
+<img src="serg_working_file_files/figure-gfm/unnamed-chunk-5-1.png" width="90%" />
 
 ``` r
 # eman - average total stats by type
@@ -134,7 +178,7 @@ ggplot(poke_tidy, aes(type1, total_stats))+
   labs(title = "Total Stats by Primary Type")
 ```
 
-![](serg_working_file_files/figure-gfm/unnamed-chunk-6-1.png)<!-- -->
+<img src="serg_working_file_files/figure-gfm/unnamed-chunk-6-1.png" width="90%" />
 
 ``` r
 #eman - height vs weight colored by strength
@@ -148,7 +192,7 @@ ggplot(poke_tidy, aes(height_m, weight_kg, color = total_stats))+
     ## Warning: Removed 20 rows containing missing values or values outside the scale range
     ## (`geom_point()`).
 
-![](serg_working_file_files/figure-gfm/unnamed-chunk-7-1.png)<!-- -->
+<img src="serg_working_file_files/figure-gfm/unnamed-chunk-7-1.png" width="90%" />
 
 ``` r
 # eman - hypothesis testing
@@ -314,7 +358,7 @@ importance_scores = importance(type_model)
 varImpPlot(type_model, main = "Feature Importance for Type Prediction")
 ```
 
-![](serg_working_file_files/figure-gfm/unnamed-chunk-12-1.png)<!-- -->
+<img src="serg_working_file_files/figure-gfm/unnamed-chunk-12-1.png" width="90%" />
 
 ``` r
 # Type-specific accuracy
@@ -352,7 +396,7 @@ ggplot(type_accuracy_df,
 theme(legend.position = "bottom")
 ```
 
-![](serg_working_file_files/figure-gfm/unnamed-chunk-12-2.png)<!-- -->
+<img src="serg_working_file_files/figure-gfm/unnamed-chunk-12-2.png" width="90%" />
 
 The Random Forest model achieved 23.2% accuracy in predicting Pokémon
 primary type from base stats alone—4.1 times better than the 5.6%
@@ -412,15 +456,22 @@ library(sjPlot)
     ##     set_theme
 
 ``` r
-capture_stats = poke_tidy |> 
+capture_stats <- poke_tidy |>
   mutate(
     capture_rate = as.numeric(capture_rate),
     percentage_male = as.numeric(percentage_male),
-    generation = as.factor(generation)
-  ) |> 
+    
+    generation = factor(
+      case_when(
+        generation %in% c("1","2","3") ~ "Early",
+        generation %in% c("4","5","6","7") ~ "Modern"
+      ),
+      levels = c("Early", "Modern")
+    )
+  ) |>
   filter(
     is_legendary == FALSE,
-    if_all(c(capture_rate, base_total, height_m, 
+    if_all(c(capture_rate, base_total, height_m,
              percentage_male, weight_kg, generation), ~ !is.na(.x))
   )
 ```
@@ -449,27 +500,22 @@ summary(capture_stats_lm)
     ## 
     ## Residuals:
     ##      Min       1Q   Median       3Q      Max 
-    ## -309.322  -38.150    2.406   36.602  256.354 
+    ## -309.936  -36.895    3.166   37.754  258.690 
     ## 
     ## Coefficients:
-    ##                  Estimate Std. Error t value Pr(>|t|)    
-    ## (Intercept)     489.68579   13.31805  36.769  < 2e-16 ***
-    ## capture_rate     -0.87326    0.04189 -20.845  < 2e-16 ***
-    ## height_m         19.67798    3.82884   5.139 3.63e-07 ***
-    ## weight_kg         0.25079    0.04899   5.120 4.01e-07 ***
-    ## percentage_male  -0.38340    0.14045  -2.730  0.00651 ** 
-    ## generation2     -17.14558    9.80499  -1.749  0.08081 .  
-    ## generation3       6.05691    9.19402   0.659  0.51026    
-    ## generation4       0.29133    9.98233   0.029  0.97673    
-    ## generation5      11.38990    8.85836   1.286  0.19897    
-    ## generation6      11.71550   10.90702   1.074  0.28316    
-    ## generation7      -3.39071   11.42065  -0.297  0.76664    
+    ##                   Estimate Std. Error t value Pr(>|t|)    
+    ## (Intercept)      482.90684   11.99129  40.271  < 2e-16 ***
+    ## capture_rate      -0.85462    0.04146 -20.615  < 2e-16 ***
+    ## height_m          20.55383    3.81794   5.383 1.01e-07 ***
+    ## weight_kg          0.24705    0.04892   5.050 5.70e-07 ***
+    ## percentage_male   -0.36099    0.14029  -2.573   0.0103 *  
+    ## generationModern   9.11267    5.50052   1.657   0.0980 .  
     ## ---
     ## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
     ## 
-    ## Residual standard error: 70.4 on 666 degrees of freedom
-    ## Multiple R-squared:  0.5684, Adjusted R-squared:  0.5619 
-    ## F-statistic:  87.7 on 10 and 666 DF,  p-value: < 2.2e-16
+    ## Residual standard error: 70.58 on 671 degrees of freedom
+    ## Multiple R-squared:  0.5629, Adjusted R-squared:  0.5596 
+    ## F-statistic: 172.8 on 5 and 671 DF,  p-value: < 2.2e-16
 
 ``` r
 tbl_regression(
@@ -482,7 +528,7 @@ tbl_regression(
     height_m ~ "Height (m)",
     weight_kg ~ "Weight (kg)",
     percentage_male ~ "Percentage Male",
-    generation ~ "Generation"
+    generation ~ "Generation (ref = Early)"
   )
 ) |> 
   modify_header(label = "**Predictors**")
@@ -895,57 +941,37 @@ tbl_regression(
   </thead>
   <tbody class="gt_table_body">
     <tr><td headers="label" class="gt_row gt_left">(Intercept)</td>
-<td headers="estimate" class="gt_row gt_center">489.69</td>
-<td headers="conf.low" class="gt_row gt_center">463.54, 515.84</td>
+<td headers="estimate" class="gt_row gt_center">482.91</td>
+<td headers="conf.low" class="gt_row gt_center">459.36, 506.45</td>
 <td headers="p.value" class="gt_row gt_center"><0.001</td></tr>
     <tr><td headers="label" class="gt_row gt_left">Capture Rate</td>
-<td headers="estimate" class="gt_row gt_center">-0.87</td>
-<td headers="conf.low" class="gt_row gt_center">-0.96, -0.79</td>
+<td headers="estimate" class="gt_row gt_center">-0.85</td>
+<td headers="conf.low" class="gt_row gt_center">-0.94, -0.77</td>
 <td headers="p.value" class="gt_row gt_center"><0.001</td></tr>
     <tr><td headers="label" class="gt_row gt_left">Height (m)</td>
-<td headers="estimate" class="gt_row gt_center">19.68</td>
-<td headers="conf.low" class="gt_row gt_center">12.16, 27.20</td>
+<td headers="estimate" class="gt_row gt_center">20.55</td>
+<td headers="conf.low" class="gt_row gt_center">13.06, 28.05</td>
 <td headers="p.value" class="gt_row gt_center"><0.001</td></tr>
     <tr><td headers="label" class="gt_row gt_left">Weight (kg)</td>
 <td headers="estimate" class="gt_row gt_center">0.25</td>
-<td headers="conf.low" class="gt_row gt_center">0.15, 0.35</td>
+<td headers="conf.low" class="gt_row gt_center">0.15, 0.34</td>
 <td headers="p.value" class="gt_row gt_center"><0.001</td></tr>
     <tr><td headers="label" class="gt_row gt_left">Percentage Male</td>
-<td headers="estimate" class="gt_row gt_center">-0.38</td>
-<td headers="conf.low" class="gt_row gt_center">-0.66, -0.11</td>
-<td headers="p.value" class="gt_row gt_center">0.007</td></tr>
-    <tr><td headers="label" class="gt_row gt_left">Generation</td>
+<td headers="estimate" class="gt_row gt_center">-0.36</td>
+<td headers="conf.low" class="gt_row gt_center">-0.64, -0.09</td>
+<td headers="p.value" class="gt_row gt_center">0.010</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">Generation (ref = Early)</td>
 <td headers="estimate" class="gt_row gt_center"><br /></td>
 <td headers="conf.low" class="gt_row gt_center"><br /></td>
 <td headers="p.value" class="gt_row gt_center"><br /></td></tr>
-    <tr><td headers="label" class="gt_row gt_left">    1</td>
+    <tr><td headers="label" class="gt_row gt_left">    Early</td>
 <td headers="estimate" class="gt_row gt_center">—</td>
 <td headers="conf.low" class="gt_row gt_center">—</td>
 <td headers="p.value" class="gt_row gt_center"><br /></td></tr>
-    <tr><td headers="label" class="gt_row gt_left">    2</td>
-<td headers="estimate" class="gt_row gt_center">-17.15</td>
-<td headers="conf.low" class="gt_row gt_center">-36.40, 2.11</td>
-<td headers="p.value" class="gt_row gt_center">0.081</td></tr>
-    <tr><td headers="label" class="gt_row gt_left">    3</td>
-<td headers="estimate" class="gt_row gt_center">6.06</td>
-<td headers="conf.low" class="gt_row gt_center">-12.00, 24.11</td>
-<td headers="p.value" class="gt_row gt_center">0.5</td></tr>
-    <tr><td headers="label" class="gt_row gt_left">    4</td>
-<td headers="estimate" class="gt_row gt_center">0.29</td>
-<td headers="conf.low" class="gt_row gt_center">-19.31, 19.89</td>
-<td headers="p.value" class="gt_row gt_center">>0.9</td></tr>
-    <tr><td headers="label" class="gt_row gt_left">    5</td>
-<td headers="estimate" class="gt_row gt_center">11.39</td>
-<td headers="conf.low" class="gt_row gt_center">-6.00, 28.78</td>
-<td headers="p.value" class="gt_row gt_center">0.2</td></tr>
-    <tr><td headers="label" class="gt_row gt_left">    6</td>
-<td headers="estimate" class="gt_row gt_center">11.72</td>
-<td headers="conf.low" class="gt_row gt_center">-9.70, 33.13</td>
-<td headers="p.value" class="gt_row gt_center">0.3</td></tr>
-    <tr><td headers="label" class="gt_row gt_left">    7</td>
-<td headers="estimate" class="gt_row gt_center">-3.39</td>
-<td headers="conf.low" class="gt_row gt_center">-25.82, 19.03</td>
-<td headers="p.value" class="gt_row gt_center">0.8</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Modern</td>
+<td headers="estimate" class="gt_row gt_center">9.11</td>
+<td headers="conf.low" class="gt_row gt_center">-1.69, 19.91</td>
+<td headers="p.value" class="gt_row gt_center">0.10</td></tr>
   </tbody>
   <tfoot>
     <tr class="gt_sourcenotes">
@@ -1036,3 +1062,65 @@ At the 5% significance level, the association between `capture_rate` and
 `height_m`, `weight_kg`, `percentage_male`, and `generation`. Therefore,
 we reject the null hypothesis that there is no linear relationship
 between the exposure and outcome of interest.
+
+``` r
+# serg - running two sample t test to explore whether dual-type pokemon have statistical advantages over single-type ones
+poke_2tt = poke_tidy |> 
+  mutate(
+    type2 = str_to_title(type2),
+    dual_type = if_else(type2 == "None", "Single", "Dual")
+  )
+
+tt_result = t.test(
+  base_total ~ dual_type,
+  data = poke_2tt,
+  var.equal = FALSE
+)
+
+tt_result
+```
+
+    ## 
+    ##  Welch Two Sample t-test
+    ## 
+    ## data:  base_total by dual_type
+    ## t = 4.388, df = 796.49, p-value = 1.298e-05
+    ## alternative hypothesis: true difference in means between group Dual and group Single is not equal to 0
+    ## 95 percent confidence interval:
+    ##  20.19406 52.88657
+    ## sample estimates:
+    ##   mean in group Dual mean in group Single 
+    ##             445.8945             409.3542
+
+``` r
+poke_2tt |> 
+  group_by(dual_type) |> 
+  summarise(
+    n = n(),
+    mean_stat = mean(base_total, na.rm = TRUE),
+    sd_stat = sd(total_stats, na.rm = TRUE)
+  )
+```
+
+    ## # A tibble: 2 × 4
+    ##   dual_type     n mean_stat sd_stat
+    ##   <chr>     <int>     <dbl>   <dbl>
+    ## 1 Dual        417      446.    119.
+    ## 2 Single      384      409.    116.
+
+``` r
+ggplot(poke_2tt, aes(x = dual_type, y = total_stats, fill = dual_type)) +
+  geom_violin(trim = FALSE) +
+  geom_boxplot(width = 0.2, alpha = 0.5) +
+  labs(
+    x = "Pokémon Typing",
+    y = "Total Base Stats",
+    title = "Single-Type vs Dual-Type Pokémon: Total Stats Comparison"
+  )
+```
+
+<img src="serg_working_file_files/figure-gfm/unnamed-chunk-14-1.png" width="90%" />
+
+## Two-Sample T-Test
+
+WRITE UP

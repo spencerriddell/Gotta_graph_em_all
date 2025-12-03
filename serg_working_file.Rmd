@@ -1,5 +1,5 @@
 ---
-title: "Serg's Project Working File"
+title: "Project Working File"
 author: "Sergio Ozoria"
 date: "2025-11-26"
 output: github_document
@@ -9,6 +9,23 @@ output: github_document
 
 ```{r loading package}
 library(tidyverse)
+library(scales)
+library(viridis)
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_colour_viridis
 ```
 
 
@@ -255,15 +272,22 @@ From a gameplay perspective, base stats provide useful but incomplete informatio
 library(gtsummary)
 library(sjPlot)
 
-capture_stats = poke_tidy |> 
+capture_stats <- poke_tidy |>
   mutate(
     capture_rate = as.numeric(capture_rate),
     percentage_male = as.numeric(percentage_male),
-    generation = as.factor(generation)
-  ) |> 
+    
+    generation = factor(
+      case_when(
+        generation %in% c("1","2","3") ~ "Early",
+        generation %in% c("4","5","6","7") ~ "Modern"
+      ),
+      levels = c("Early", "Modern")
+    )
+  ) |>
   filter(
     is_legendary == FALSE,
-    if_all(c(capture_rate, base_total, height_m, 
+    if_all(c(capture_rate, base_total, height_m,
              percentage_male, weight_kg, generation), ~ !is.na(.x))
   )
   
@@ -287,7 +311,7 @@ tbl_regression(
     height_m ~ "Height (m)",
     weight_kg ~ "Weight (kg)",
     percentage_male ~ "Percentage Male",
-    generation ~ "Generation"
+    generation ~ "Generation (ref = Early)"
   )
 ) |> 
   modify_header(label = "**Predictors**")
@@ -327,8 +351,43 @@ Among all non-legendary Pokémon included our cross-generational dataset of the 
 
 At the 5% significance level, the association between `capture_rate` and `base_total` is statistically significant, after adjusting for `height_m`, `weight_kg`, `percentage_male`, and `generation`. Therefore, we reject the null hypothesis that there is no linear relationship between the exposure and outcome of interest. 
 
+```{r}
 
+# serg - running two sample t test to explore whether dual-type pokemon have statistical advantages over single-type ones
+poke_2tt = poke_tidy |> 
+  mutate(
+    type2 = str_to_title(type2),
+    dual_type = if_else(type2 == "None", "Single", "Dual")
+  )
 
+tt_result = t.test(
+  base_total ~ dual_type,
+  data = poke_2tt,
+  var.equal = FALSE
+)
 
+tt_result
+
+poke_2tt |> 
+  group_by(dual_type) |> 
+  summarise(
+    n = n(),
+    mean_stat = mean(base_total, na.rm = TRUE),
+    sd_stat = sd(total_stats, na.rm = TRUE)
+  )
+
+ggplot(poke_2tt, aes(x = dual_type, y = total_stats, fill = dual_type)) +
+  geom_violin(trim = FALSE) +
+  geom_boxplot(width = 0.2, alpha = 0.5) +
+  labs(
+    x = "Pokémon Typing",
+    y = "Total Base Stats",
+    title = "Single-Type vs Dual-Type Pokémon: Total Stats Comparison"
+  )
+```
+
+## Two-Sample T-Test
+
+WRITE UP
 
 
