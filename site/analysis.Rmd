@@ -3,19 +3,58 @@ title: "Statistical and Machine Learning Analysis"
 output: html_document
 ---
 
-```{r setup, message=FALSE, warning=FALSE}
+```{r setup, include=FALSE}
 library(tidyverse)
 library(broom)
 library(caret)
 library(randomForest)
+library(pROC)
+library(gt)
+
 theme_set(theme_minimal())
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+# Reusable helpers
+`%||%` <- function(x, y) if (is.null(x)) y else x
+fmt_pct <- function(x, digits = 1) sprintf(paste0("%.", digits, "f%%"), 100 * x)
+
+gt_basic <- function(df, title = NULL, subtitle = NULL) {
+  gt(df) |>
+    tab_header(title = md(title %||% ""), subtitle = md(subtitle %||% "")) |>
+    tab_options(
+      table.font.names = c("Montserrat", "system-ui", "-apple-system", "Arial", "sans-serif"),
+      table.width = px(760),
+      heading.align = "left"
+    ) |>
+    fmt_missing(columns = everything(), missing_text = "—")
+}
+
+gt_compact <- function(df, title = NULL, subtitle = NULL) {
+  gt_basic(df, title, subtitle) |>
+    opt_row_striping() |>
+    cols_align(align = "left", columns = everything()) |>
+    tab_style(
+      style = cell_borders(sides = "all", color = "#e6e6e6", weight = px(1)),
+      locations = cells_body()
+    )
+}
+
+# Pokémon type palette (consistent with EDA)
+type_cols <- c(
+  "Bug"      = "#A6B91A", "Dark"     = "#705746", "Dragon"   = "#6F35FC",
+  "Electric" = "#F7D02C", "Fairy"    = "#D685AD", "Fighting" = "#C22E28",
+  "Fire"     = "#EE8130", "Flying"   = "#A98FF3", "Ghost"    = "#735797",
+  "Grass"    = "#7AC74C", "Ground"   = "#E2BF65", "Ice"      = "#96D9D6",
+  "Normal"   = "#A8A77A", "Poison"   = "#A33EA1", "Psychic"  = "#F95587",
+  "Rock"     = "#B6A136", "Steel"    = "#B7B7CE", "Water"    = "#6390F0"
+)
 ```
 
 ```{r data}
 poke <- readr::read_csv("Data/pokemon_clean.csv", show_col_types = FALSE) |>
   mutate(
-    type1 = as.factor(type1),
-    generation = as.factor(generation),
+    type1        = as.factor(stringr::str_to_title(type1)),
+    generation   = as.factor(generation),
     is_legendary = as.logical(is_legendary)
   )
 ```
@@ -24,15 +63,131 @@ poke <- readr::read_csv("Data/pokemon_clean.csv", show_col_types = FALSE) |>
 
 ```{r anova}
 anova_fit <- aov(base_total ~ type1, data = poke)
-anova_results <- broom::tidy(anova_fit)
-anova_results
+anova_tidy <- broom::tidy(anova_fit)
+
+# Clear, human-friendly ANOVA table
+ss_total <- sum(anova_tidy$sumsq, na.rm = TRUE)
+anova_tbl <- anova_tidy |>
+  transmute(
+    Term          = case_when(term == "type1" ~ "Primary Type (type1)",
+                              term == "Residuals" ~ "Residuals",
+                              TRUE ~ term),
+    DF            = df,
+    `Sum Sq`      = round(sumsq, 2),
+    `Mean Sq`     = round(meansq, 2),
+    `F Statistic` = round(statistic %||% NA_real_, 3),
+    `Pr(>F)`      = scales::pvalue(p.value %||% NA_real_),
+    `Eta-squared` = ifelse(term == "type1", round(sumsq / ss_total, 3), NA_real_)
+  )
+
+gt_compact(anova_tbl, title = "ANOVA: Base Total ~ Primary Type",
+           subtitle = "Effect size shown as Eta-squared for type1")
+```
+
+```{r anova-boxplot}
+# Boxplot by type with palette
+ggplot(poke, aes(type1, base_total, fill = type1)) +
+  geom_boxplot(outlier.alpha = 0.25, width = 0.7) +
+  scale_fill_manual(values = type_cols, guide = "none") +
+  labs(title = "Base Total by Primary Type",
+       x = "Primary Type", y = "Total Base Stats") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+```{r tukey-table}
+# Tukey post-hoc table, simplified labels and significance
+tuk <- TukeyHSD(anova_fit)
+tuk_raw <- broom::tidy(tuk)
+
+tuk_tidy <- tuk_raw |>
+  mutate(
+    Type_A      = sub("-.*$", "", contrast),
+    Type_B      = sub(".*-", "", contrast),
+    `Mean Diff` = round(estimate, 2),
+    `CI Low`    = round(conf.low, 2),
+    `CI High`   = round(conf.high, 2),
+    `Adj p`     = scales::pvalue(adj.p.value),
+    Significant = adj.p.value < 0.05
+  ) |>
+  arrange(adj.p.value)  # arrange BEFORE selecting/renaming away adj.p.value
+
+gt_tbl <- gt_compact(
+  tuk_tidy |> select(Type_A, Type_B, `Mean Diff`, `CI Low`, `CI High`, `Adj p`, Significant),
+  title = "Tukey HSD Post-hoc: Pairwise Type Differences",
+  subtitle = "Pairs sorted by adjusted p-value; Significant = adj p < 0.05"
+) |>
+  tab_style(
+    style = cell_fill(color = "#fff5f5"),
+    locations = cells_body(rows = Significant)
+  ) |>
+  fmt_markdown(columns = "Significant")
+
+gt_tbl
+```
+
+```{r tukey-plot-sig}
+# Significant-only plot with type colors for Type B
+tukey_sig_df <- tuk_tidy |>
+  filter(Significant) |>
+  mutate(
+    Pair     = paste0(Type_B, " - ", Type_A),
+    `Type B` = Type_B
+  ) |>
+  arrange(`Mean Diff`)
+
+ggplot(tukey_sig_df,
+       aes(y = reorder(Pair, `Mean Diff`), x = `Mean Diff`, color = `Type B`)) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "gray40") +
+  geom_errorbarh(aes(xmin = `CI Low`, xmax = `CI High`), height = 0.28, size = 1.0) +
+  geom_point(size = 2.6) +
+  scale_color_manual(values = type_cols, guide = guide_legend(title = "Type B")) +
+  labs(
+    title = "Significant Tukey Differences (adj p < 0.05)",
+    subtitle = "Intervals colored by Type B in the contrast (B - A)",
+    x = "Mean Difference in Total Base Stats (B - A)",
+    y = "Type Pair (B - A)"
+  ) +
+  theme(legend.position = "top")
 ```
 
 ## Two-sample t-test: Are legendary Pokémon stronger?
 
 ```{r ttest}
-ttest_results <- t.test(base_total ~ is_legendary, data = poke)
-ttest_results
+tt <- t.test(base_total ~ is_legendary, data = poke)
+tt_tidy <- broom::tidy(tt)
+
+# Friendly t-test summary
+means <- poke |>
+  group_by(is_legendary) |>
+  summarise(
+    `Mean Total` = round(mean(base_total, na.rm = TRUE), 2),
+    N            = n(),
+    .groups = "drop"
+  ) |>
+  mutate(Group = ifelse(is_legendary, "Legendary", "Non-legendary")) |>
+  select(Group, N, `Mean Total`)
+
+tt_tbl <- tibble::tibble(
+  `Mean Difference (Legendary - Non)` = round(tt_tidy$estimate, 2),
+  `95% CI Low`  = round(tt_tidy$conf.low, 2),
+  `95% CI High` = round(tt_tidy$conf.high, 2),
+  `p-value`     = scales::pvalue(tt_tidy$p.value)
+)
+
+gt_compact(means, title = "Group Means: Total Base Stats") |>
+  tab_source_note(md("Groups defined by `is_legendary`."))
+gt_compact(tt_tbl, title = "Two-sample t-test",
+           subtitle = "Outcome: Total Base Stats; Grouping: Legendary vs Non-legendary")
+```
+
+```{r ttest-viz}
+ggplot(poke, aes(base_total, fill = is_legendary)) +
+  geom_density(alpha = 0.35) +
+  scale_fill_manual(values = c(`FALSE` = "#6390F0", `TRUE` = "#EE8130"),
+                    labels = c("Non-legendary", "Legendary"), name = NULL) +
+  labs(title = "Distribution of Total Base Stats by Legendary Status",
+       x = "Total Base Stats", y = "Density") +
+  theme(legend.position = "top")
 ```
 
 ## Logistic regression: Predicting legendary status
@@ -41,39 +196,118 @@ ttest_results
 glm_fit <- glm(
   is_legendary ~ base_total + type1 + generation,
   data = poke,
-  family = "binomial"
+  family = binomial()
 )
-summary(glm_fit)
+
+glm_tidy <- broom::tidy(glm_fit, exponentiate = TRUE, conf.int = TRUE) |>
+  transmute(
+    Term        = case_when(
+      term == "(Intercept)" ~ "Intercept",
+      grepl("^type1", term) ~ gsub("^type1", "Type1:", term),
+      grepl("^generation", term) ~ gsub("^generation", "Gen:", term),
+      TRUE ~ term
+    ),
+    `Odds Ratio` = round(estimate, 3),
+    `CI Low`     = round(conf.low, 3),
+    `CI High`    = round(conf.high, 3),
+    `p-value`    = scales::pvalue(p.value)
+  )
+
+gt_compact(glm_tidy, title = "Logistic Regression (Odds Ratios)",
+           subtitle = "Outcome: Legendary status; predictors include total, type, generation")
+```
+
+```{r logistic-roc}
+pred_prob <- predict(glm_fit, type = "response")
+roc_obj   <- pROC::roc(response = poke$is_legendary, predictor = pred_prob)
+auc_val   <- as.numeric(pROC::auc(roc_obj))
+
+# ROC summary table + plot
+roc_tbl <- tibble::tibble(`AUC` = round(auc_val, 3))
+gt_compact(roc_tbl, title = "ROC AUC")
+
+plot(roc_obj, col = "#1976d2", lwd = 2, main = paste0("ROC Curve (AUC = ", round(auc_val, 3), ")"))
+abline(0, 1, lty = 2, col = "gray40")
+```
+
+```{r logistic-calibration}
+# Calibration: predicted vs empirical rate (deciles)
+calib_df <- tibble(
+  pred = pred_prob,
+  y    = poke$is_legendary
+) |>
+  mutate(bin = cut(pred, breaks = seq(0, 1, by = 0.1), include.lowest = TRUE)) |>
+  group_by(bin) |>
+  summarise(
+    `Mean Pred` = mean(pred),
+    `Empirical Rate` = mean(y),
+    N = n(),
+    .groups = "drop"
+  )
+
+gt_compact(calib_df, title = "Calibration bins",
+           subtitle = "Predicted probability vs empirical legendary rate (deciles)")
+
+ggplot(calib_df, aes(`Mean Pred`, `Empirical Rate`)) +
+  geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "gray40") +
+  geom_point(size = 2, color = "#d32f2f") +
+  geom_smooth(method = "lm", se = FALSE, color = "#1976d2", linetype = "dotted") +
+  labs(title = "Calibration: Predicted vs Empirical Legendary Rate",
+       x = "Mean Predicted Probability (bin)", y = "Empirical Legendary Rate")
 ```
 
 ## Random Forest: Predicting primary type from base stats
 
-```{r rf, message=FALSE, warning=FALSE}
+```{r rf}
 set.seed(123)
 poke_type <- poke |>
   select(type1, hp, attack, defense, sp_attack, sp_defense, speed) |>
   mutate(type1 = factor(type1))
 
-idx <- createDataPartition(poke_type$type1, p = 0.8, list = FALSE)
+idx   <- createDataPartition(poke_type$type1, p = 0.8, list = FALSE)
 train <- poke_type[idx, ]
 test  <- poke_type[-idx, ]
 
-rf_fit <- randomForest(type1 ~ ., data = train, ntree = 500)
+rf_fit <- randomForest(type1 ~ ., data = train, ntree = 500, importance = TRUE)
 pred   <- predict(rf_fit, newdata = test)
 
-acc <- mean(pred == test$type1)
-baseline <- 1/length(levels(train$type1))
+acc      <- mean(pred == test$type1)
+baseline <- 1 / length(levels(train$type1))
 
-list(
-  Accuracy  = round(100*acc, 1),
-  Baseline  = round(100*baseline, 1),
-  Improvement_pts = round(100*(acc - baseline), 1)
+rf_summary <- tibble::tibble(
+  Metric  = c("Accuracy", "Naive baseline (1 / #types)", "Improvement (pts)"),
+  Value   = c(fmt_pct(acc, 2), fmt_pct(baseline, 2), sprintf("%.2f pts", 100 * (acc - baseline)))
 )
+
+gt_compact(rf_summary, title = "Random Forest Performance Summary")
 ```
 
-### Brief interpretation (to customize)
+```{r rf-importance}
+imp <- importance(rf_fit)
+imp_tbl <- tibble::tibble(
+  Stat = rownames(imp),
+  `Mean Decrease Gini` = round(imp[, "MeanDecreaseGini"], 2)
+) |>
+  arrange(desc(`Mean Decrease Gini`))
 
-- ANOVA: Inspect the p-value to assess differences in mean total stats across primary types.
-- t-test: Typically shows legendaries have higher total stats; confirm via mean difference and confidence interval.
-- Logistic regression: `base_total` often strongly predicts `is_legendary`; type and generation may add nuance.
-- Random Forest: Expect performance above the naive baseline; examine variable importance with `varImpPlot(rf_fit)` if desired.
+gt_compact(imp_tbl, title = "Variable Importance (Mean Decrease Gini)")
+
+ggplot(imp_tbl, aes(x = reorder(Stat, `Mean Decrease Gini`), y = `Mean Decrease Gini`)) +
+  geom_col(fill = "#6F35FC") +
+  coord_flip() +
+  labs(title = "Random Forest: Variable Importance",
+       x = "Stat", y = "Mean Decrease Gini")
+```
+
+```{r rf-confusion}
+cm_table <- table(Truth = test$type1, Pred = pred)
+cm_df    <- as.data.frame(cm_table)
+
+# Confusion matrix (heatmap) with counts
+ggplot(cm_df, aes(Pred, Truth, fill = Freq)) +
+  geom_tile(color = "white") +
+  scale_fill_gradient(low = "#e0ecf4", high = "#0868ac") +
+  geom_text(aes(label = Freq), color = "black", size = 3) +
+  labs(title = "Random Forest Confusion Matrix (Test Set)", x = "Predicted Type", y = "True Type") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```

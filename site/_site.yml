@@ -4,8 +4,10 @@ output_dir: "docs"
 
 navbar:
   left:
-    - text: "About our Trainers"
+    - text: "Home"
       href: index.html
+    - text: "About our Trainers"
+      href: about.html
     - text: "Exploratory Data Analysis"
       href: eda.html
     - text: "Statistical & ML Analysis"
@@ -14,9 +16,6 @@ navbar:
       href: final_report.html
     - text: "Contact Us"
       href: contact.html
-  right:
-    - icon: fa-github
-      href: https://github.com/mb5357/Gotta_graph_em_all
 
 # Exclude working files from the site build
 exclude:

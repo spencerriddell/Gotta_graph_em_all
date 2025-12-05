@@ -1,0 +1,71 @@
+---
+title: "About our Trainers"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(htmltools)
+knitr::opts_chunk$set(echo = FALSE)  # important: no results='asis'
+```
+
+```{r trainers}
+trainers <- data.frame(
+  name   = c("Sergio Ozoria Ramirez", "Maria Beg", "Eman Ibrahim", "Spencer Riddell"),
+  github = c("smo2147",               "mb5357",    "ei2291",       "swr2118"),
+  avatar = c(
+    "https://github.com/smo2147.png?size=360",
+    "https://github.com/mb5357.png?size=360",
+    "https://github.com/ei2291.png?size=360",
+    "https://github.com/swr2118.png?size=360"
+  ),
+  bio = c(
+    "Add a short bio here (background, interests, role on the project).",
+    "Add a short bio here (background, interests, role on the project).",
+    "Add a short bio here (background, interests, role on the project).",
+    "Add a short bio here (background, interests, role on the project)."
+  ),
+  stringsAsFactors = FALSE
+)
+
+card_for <- function(name, github, avatar, bio) {
+  tags$div(
+    class = "trainer-card trainer-card--horiz",
+    tags$a(
+      href   = paste0("https://github.com/", github),
+      target = "_blank", rel = "noopener",
+      tags$img(src = avatar, alt = name)
+    ),
+    tags$div(
+      class = "trainer-card__body",
+      tags$h3(class = "trainer-card__name", name),
+      tags$p(
+        tags$a(
+          href   = paste0("https://github.com/", github),
+          target = "_blank", rel = "noopener",
+          paste0("github.com/", github)
+        )
+      ),
+      tags$p(tags$em("Bio:"), " ", bio)
+    )
+  )
+}
+
+cards <- lapply(seq_len(nrow(trainers)), function(i) {
+  x <- trainers[i, , drop = FALSE]
+  card_for(x$name, x$github, x$avatar, x$bio)
+})
+
+hero <- tags$div(
+  class = "hero",
+  tags$h1("Meet the Trainers"),
+  tags$p(style = "margin: 0.5rem 0 0;", "The team behind Gotta Graph ’Em All")
+)
+
+page <- tagList(
+  hero,
+  tags$div(class = "trainer-grid", do.call(tagList, cards))
+)
+
+# Return the tag object (htmltools will render it properly)
+page
+```

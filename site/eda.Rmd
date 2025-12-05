@@ -3,141 +3,250 @@ title: "Exploratory Data Analysis"
 output: html_document
 ---
 
-```{r setup, message=FALSE, warning=FALSE}
+```{r setup, echo=FALSE, message=FALSE, warning=FALSE}
 library(tidyverse)
 library(plotly)
+library(crosstalk)
+library(htmltools)
 theme_set(theme_minimal())
+
+# Controls bar helper
+controls_bar <- function(...) {
+  htmltools::tags$div(class = "controls-bar", ...)
+}
 ```
 
-```{r data, message=FALSE}
-# Prefer the cleaned dataset already saved by the team
+```{r data, echo=FALSE, message=FALSE}
+# Load and prepare data
 poke <- readr::read_csv("Data/pokemon_clean.csv", show_col_types = FALSE) |>
   mutate(
-    type1 = as.factor(type1),
-    type2 = as.factor(type2),
+    type1 = forcats::fct_drop(as.factor(stringr::str_to_title(type1))),
+    type2 = forcats::fct_drop(as.factor(stringr::str_to_title(type2))),
+    generation = as.factor(generation),
     name  = as.character(name)
   )
 
-# Helper for rich hover text
+# Pokémon Type palette (common hex values)
+type_cols <- c(
+  "Bug"      = "#A6B91A", "Dark"     = "#705746", "Dragon"   = "#6F35FC",
+  "Electric" = "#F7D02C", "Fairy"    = "#D685AD", "Fighting" = "#C22E28",
+  "Fire"     = "#EE8130", "Flying"   = "#A98FF3", "Ghost"    = "#735797",
+  "Grass"    = "#7AC74C", "Ground"   = "#E2BF65", "Ice"      = "#96D9D6",
+  "Normal"   = "#A8A77A", "Poison"   = "#A33EA1", "Psychic"  = "#F95587",
+  "Rock"     = "#B6A136", "Steel"    = "#B7B7CE", "Water"    = "#6390F0"
+)
+
+# Row-wise hex color for exact mapping in plots
 poke <- poke |>
   mutate(
-    hover = paste0(
-      "<b>", name, "</b>",
-      "<br>Primary: ", type1,
-      "<br>Secondary: ", ifelse(is.na(type2) | type2 == "None", "—", as.character(type2)),
-      "<br>Total: ", base_total
+    color_hex = unname(type_cols[as.character(type1)]),
+    color_hex = ifelse(is.na(color_hex), "#555555", color_hex),
+    hover_total = paste0(
+      "<b style='font-size:13px;'>", name, "</b>",
+      "<br><span style='opacity:.8;'>Type:</span> ", type1,
+      ifelse(is.na(type2) | type2 == "None", "", paste0(" / ", type2)),
+      "<br><span style='opacity:.8;'>Total:</span> ", base_total
     )
   )
+
+# Long format for per-stat plots
+stat_cols <- c("hp","attack","defense","sp_attack","sp_defense","speed")
+poke_long <- poke |>
+  select(name, type1, type2, generation, color_hex, all_of(stat_cols)) |>
+  tidyr::pivot_longer(
+    cols = all_of(stat_cols),
+    names_to = "stat_name",
+    values_to = "stat_value"
+  ) |>
+  mutate(
+    stat_label = dplyr::recode(
+      stat_name,
+      hp = "HP", attack = "Attack", defense = "Defense",
+      sp_attack = "Sp. Attack", sp_defense = "Sp. Defense", speed = "Speed"
+    ),
+    hover_stat = paste0(
+      "<b style='font-size:13px;'>", name, "</b>",
+      "<br><span style='opacity:.8;'>Type:</span> ", type1,
+      ifelse(is.na(type2) | type2 == "None", "", paste0(" / ", type2)),
+      "<br><span style='opacity:.8;'>", stat_label, ":</span> ", stat_value
+    )
+  )
+
+# Jitter vectors for visual separation
+set.seed(42); yjit_total <- jitter(rep(0, nrow(poke)), amount = 0.08)
+set.seed(7);  yjit_stat  <- jitter(rep(0, nrow(poke_long)), amount = 0.10)
+
+# Plot theme helper
+apply_plot_theme <- function(p) {
+  layout(
+    p,
+    paper_bgcolor = "rgba(255,255,255,1)",
+    plot_bgcolor  = "rgba(255,255,255,1)",
+    font = list(family = "Montserrat, Arial, sans-serif", color = "#111"),
+    xaxis = list(zeroline = FALSE, gridcolor = "rgba(0,0,0,0.08)"),
+    yaxis = list(zeroline = FALSE, gridcolor = "rgba(0,0,0,0.08)"),
+    margin = list(l = 60, r = 40, t = 70, b = 60)
+  )
+}
 ```
 
-## Distribution of Total Stats (interactive dots)
+## Total Base Stats
 
-```{r dist-dots}
-set.seed(1)
-y_jitter <- jitter(rep(0, nrow(poke)), amount = 0.08)
+```{r p1, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
+# Shared data for plot 1
+sd1 <- SharedData$new(
+  poke |> select(name, type1, type2, generation, base_total, color_hex, hover_total),
+  group = "p1"
+)
 
+# Controls above the plot (wrap each in .ctrl for width control)
+ctrls1 <- controls_bar(
+  tags$div(class = "ctrl", filter_select("p1_gen",  "Generation",  sd1, ~generation, multiple = FALSE)),
+  tags$div(class = "ctrl", filter_select("p1_type", "Primary Type", sd1, ~type1,     multiple = FALSE))
+)
+
+# Plot
 p1 <- plot_ly(
-  data = poke,
+  sd1,
   x = ~base_total,
-  y = ~y_jitter,
+  y = yjit_total,
+  text = ~hover_total,
   type = "scatter",
   mode = "markers",
-  text = ~hover,
-  hoverinfo = "text",
-  marker = list(size = 7, opacity = 0.7, color = ~as.factor(type1))
+  hovertemplate = "%{text}<extra></extra>",
+  marker = list(
+    size = 9, opacity = 0.92,
+    line = list(color = "rgba(0,0,0,0.35)", width = 1.2)
+  )
 ) |>
+  add_markers(marker = list(color = ~color_hex), showlegend = FALSE) |>
   layout(
-    title = "Distribution of Pokémon Total Base Stats",
+    title = list(
+      text = "Distribution of Pokémon Total Base Stats",
+      font = list(family = "PocketMonk, Montserrat, sans-serif", size = 26)
+    ),
+    xaxis = list(title = "Total Base Stats", rangeslider = list(visible = TRUE)),
+    yaxis = list(title = "", showticklabels = FALSE, range = c(-0.4, 0.4))
+  )
+
+p1 <- apply_plot_theme(p1)
+htmltools::tagList(ctrls1, p1)
+```
+
+## Select by Type
+
+```{r p2, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
+sd2 <- SharedData$new(
+  poke |> select(name, type1, type2, generation, base_total, color_hex, hover_total),
+  group = "p2"
+)
+
+ctrls2 <- controls_bar(
+  tags$div(class = "ctrl", filter_select("p2_type", "Primary Type", sd2, ~type1, multiple = FALSE))
+)
+
+p2 <- plot_ly(
+  sd2,
+  x = ~base_total,
+  y = yjit_total,
+  text = ~hover_total,
+  type = "scatter",
+  mode = "markers",
+  hovertemplate = "%{text}<extra></extra>",
+  marker = list(
+    size = 10, opacity = 0.95,
+    line = list(color = "rgba(0,0,0,0.45)", width = 1.4)
+  )
+) |>
+  add_markers(marker = list(color = ~color_hex), showlegend = FALSE) |>
+  layout(
+    title = list(
+      text = "Total Base Stats by Primary Type",
+      font = list(family = "PocketMonk, Montserrat, sans-serif", size = 26)
+    ),
     xaxis = list(title = "Total Base Stats"),
-    yaxis = list(title = "", showticklabels = FALSE),
-    showlegend = FALSE
+    yaxis = list(title = "", showticklabels = FALSE, range = c(-0.35, 0.35))
   )
 
-p1
+p2 <- apply_plot_theme(p2)
+htmltools::tagList(ctrls2, p2)
 ```
 
-## Total Stats by Primary Type (interactive dropdown)
+## Select by Stat
 
-This chart lets you select a primary type to focus on. Hover shows the Pokémon name and types.
-
-```{r by-type-dropdown}
-types <- sort(unique(as.character(poke$type1)))
-
-# Build one trace per type plus an "All Types" trace
-traces <- list(
-  list(
-    name  = "All Types",
-    x     = poke$base_total,
-    y     = jitter(rep(0, nrow(poke)), amount = 0.1),
-    text  = poke$hover,
-    type  = "scatter",
-    mode  = "markers",
-    marker= list(size = 7, opacity = 0.7, color = I("#555555"))
-  )
+```{r p3, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
+sd3 <- SharedData$new(
+  poke_long |> select(name, type1, type2, generation, stat_name, stat_label, stat_value, color_hex, hover_stat),
+  group = "p3"
 )
 
-for (tp in types) {
-  sub <- dplyr::filter(poke, type1 == tp)
-  traces[[length(traces) + 1]] <- list(
-    name  = tp,
-    x     = sub$base_total,
-    y     = jitter(rep(0, nrow(sub)), amount = 0.1),
-    text  = sub$hover,
-    type  = "scatter",
-    mode  = "markers",
-    marker= list(size = 7, opacity = 0.85)
-  )
-}
-
-# Visibility: start with "All Types" visible
-visible_init <- c(TRUE, rep(FALSE, length(types)))
-
-# Buttons: one for "All Types" and one per type
-buttons <- list(
-  list(
-    method = "update",
-    label  = "All Types",
-    args   = list(list(visible = c(TRUE, rep(FALSE, length(types)))),
-                  list(title = "Total Base Stats by Primary Type: All"))
-  )
+ctrls3 <- controls_bar(
+  tags$div(class = "ctrl", filter_select("p3_stat", "Stat", sd3, ~stat_label, multiple = FALSE))
 )
 
-for (i in seq_along(types)) {
-  vis <- c(FALSE, rep(FALSE, length(types)))
-  vis[i + 1] <- TRUE  # turn on the i-th type trace
-  buttons[[length(buttons) + 1]] <- list(
-    method = "update",
-    label  = types[i],
-    args   = list(list(visible = vis),
-                  list(title = paste("Total Base Stats by Primary Type:", types[i])))
+p3 <- plot_ly(
+  sd3,
+  x = ~stat_value,
+  y = yjit_stat,
+  text = ~hover_stat,
+  type = "scatter",
+  mode = "markers",
+  hovertemplate = "%{text}<extra></extra>",
+  marker = list(
+    size = 9, opacity = 0.92,
+    line = list(color = "rgba(0,0,0,0.35)", width = 1.2)
   )
-}
+) |>
+  add_markers(marker = list(color = ~color_hex), showlegend = FALSE) |>
+  layout(
+    title = list(
+      text = "Distribution of Selected Stat",
+      font = list(family = "PocketMonk, Montserrat, sans-serif", size = 26)
+    ),
+    xaxis = list(title = "Stat Value", rangeslider = list(visible = TRUE)),
+    yaxis = list(title = "", showticklabels = FALSE, range = c(-0.4, 0.4))
+  )
 
-p2 <- plot_ly()
-for (tr in traces) {
-  p2 <- add_trace(p2, !!!tr)
-}
-
-p2 <- layout(
-  p2,
-  title  = "Total Base Stats by Primary Type: All",
-  xaxis  = list(title = "Total Base Stats"),
-  yaxis  = list(title = "", showticklabels = FALSE),
-  updatemenus = list(
-    list(
-      type = "dropdown",
-      direction = "down",
-      x = 0.01, y = 1.08,
-      showactive = TRUE,
-      buttons = buttons
-    )
-  ),
-  showlegend = FALSE
-)
-
-p2
+p3 <- apply_plot_theme(p3)
+htmltools::tagList(ctrls3, p3)
 ```
 
-Notes:
-- Both charts are client-side interactive and work on GitHub Pages (no Shiny runtime required).
-- Data source: Data/pokemon_clean.csv (from your existing pipeline).
+## Select by Stat AND Type
+
+```{r p4, echo=FALSE, results='asis', message=FALSE, warning=FALSE}
+sd4 <- SharedData$new(
+  poke_long |> select(name, type1, type2, generation, stat_name, stat_label, stat_value, color_hex, hover_stat),
+  group = "p4"
+)
+
+ctrls4 <- controls_bar(
+  tags$div(class = "ctrl", filter_select("p4_stat", "Stat",        sd4, ~stat_label, multiple = FALSE)),
+  tags$div(class = "ctrl", filter_select("p4_type", "Primary Type", sd4, ~type1,     multiple = FALSE))
+)
+
+p4 <- plot_ly(
+  sd4,
+  x = ~stat_value,
+  y = yjit_stat,
+  text = ~hover_stat,
+  type = "scatter",
+  mode = "markers",
+  hovertemplate = "%{text}<extra></extra>",
+  marker = list(
+    size = 9, opacity = 0.92,
+    line = list(color = "rgba(0,0,0,0.35)", width = 1.2)
+  )
+) |>
+  add_markers(marker = list(color = ~color_hex), showlegend = FALSE) |>
+  layout(
+    title = list(
+      text = "Filter by Stat and Type",
+      font = list(family = "PocketMonk, Montserrat, sans-serif", size = 26)
+    ),
+    xaxis = list(title = "Stat Value", rangeslider = list(visible = TRUE)),
+    yaxis = list(title = "", showticklabels = FALSE, range = c(-0.4, 0.4))
+  )
+
+p4 <- apply_plot_theme(p4)
+htmltools::tagList(ctrls4, p4)
+```
