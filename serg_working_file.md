@@ -3,8 +3,6 @@ Project Working File
 Sergio Ozoria
 2025-11-26
 
-# 1. Preparing variables
-
 ``` r
 library(tidyverse)
 ```
@@ -46,6 +44,35 @@ library(viridis)
     ## The following object is masked from 'package:scales':
     ## 
     ##     viridis_pal
+
+``` r
+library(randomForest)
+```
+
+    ## randomForest 4.7-1.2
+    ## Type rfNews() to see new features/changes/bug fixes.
+    ## 
+    ## Attaching package: 'randomForest'
+    ## 
+    ## The following object is masked from 'package:dplyr':
+    ## 
+    ##     combine
+    ## 
+    ## The following object is masked from 'package:ggplot2':
+    ## 
+    ##     margin
+
+``` r
+library(caret)
+```
+
+    ## Loading required package: lattice
+    ## 
+    ## Attaching package: 'caret'
+    ## 
+    ## The following object is masked from 'package:purrr':
+    ## 
+    ##     lift
 
 ``` r
 knitr::opts_chunk$set(
@@ -123,14 +150,6 @@ poke_tidy =
 ```
 
 ``` r
-# eman - create total stats
-
-poke_tidy =
-  poke_tidy |> 
-  mutate(total_stats = hp + attack +defense + sp_attack + sp_defense + speed )
-```
-
-``` r
 # eman - create attack/defense ratio (useful for visuals later)
 
 poke_tidy = 
@@ -144,7 +163,7 @@ poke_tidy =
 head(poke_tidy)
 ```
 
-    ## # A tibble: 6 × 44
+    ## # A tibble: 6 × 43
     ##   abilities             against_bug against_dark against_dragon against_electric
     ##   <chr>                       <dbl>        <dbl>          <dbl>            <dbl>
     ## 1 Overgrow, Chlorophyll        1               1              1              0.5
@@ -153,7 +172,7 @@ head(poke_tidy)
     ## 4 Blaze, Solar Power           0.5             1              1              1  
     ## 5 Blaze, Solar Power           0.5             1              1              1  
     ## 6 Blaze, Solar Power           0.25            1              1              2  
-    ## # ℹ 39 more variables: against_fairy <dbl>, against_fight <dbl>,
+    ## # ℹ 38 more variables: against_fairy <dbl>, against_fight <dbl>,
     ## #   against_fire <dbl>, against_flying <dbl>, against_ghost <dbl>,
     ## #   against_grass <dbl>, against_ground <dbl>, against_ice <dbl>,
     ## #   against_normal <dbl>, against_poison <dbl>, against_psychic <dbl>,
@@ -162,28 +181,28 @@ head(poke_tidy)
     ## #   capture_rate <chr>, classfication <chr>, defense <dbl>, …
 
 ``` r
-ggplot(poke_tidy, aes(total_stats))+
+ggplot(poke_tidy, aes(base_total))+
   geom_histogram(bins = 30, fill = "skyblue", color = "black")+
   labs(title = "Distribution of Total Stats")
 ```
 
-<img src="serg_working_file_files/figure-gfm/unnamed-chunk-5-1.png" width="90%" />
+<img src="serg_working_file_files/figure-gfm/unnamed-chunk-4-1.png" width="90%" />
 
 ``` r
 # eman - average total stats by type
 
-ggplot(poke_tidy, aes(type1, total_stats))+
+ggplot(poke_tidy, aes(type1, base_total))+
   geom_boxplot()+
   coord_flip()+
   labs(title = "Total Stats by Primary Type")
 ```
 
-<img src="serg_working_file_files/figure-gfm/unnamed-chunk-6-1.png" width="90%" />
+<img src="serg_working_file_files/figure-gfm/unnamed-chunk-5-1.png" width="90%" />
 
 ``` r
 #eman - height vs weight colored by strength
 
-ggplot(poke_tidy, aes(height_m, weight_kg, color = total_stats))+
+ggplot(poke_tidy, aes(height_m, weight_kg, color = base_total))+
   geom_point(alpha = 0.6, size =2)+
   scale_color_viridis_c()+
   labs(title = "Height vs Weight (Colored by total stats")
@@ -192,7 +211,7 @@ ggplot(poke_tidy, aes(height_m, weight_kg, color = total_stats))+
     ## Warning: Removed 20 rows containing missing values or values outside the scale range
     ## (`geom_point()`).
 
-<img src="serg_working_file_files/figure-gfm/unnamed-chunk-7-1.png" width="90%" />
+<img src="serg_working_file_files/figure-gfm/unnamed-chunk-6-1.png" width="90%" />
 
 ``` r
 # eman - hypothesis testing
@@ -200,7 +219,7 @@ ggplot(poke_tidy, aes(height_m, weight_kg, color = total_stats))+
 # Null hypothesis: mean total stats are equal across all types
 
 anova_type = 
-  aov(total_stats ~ type1, data = poke_tidy)
+  aov(base_total ~ type1, data = poke_tidy)
 summary(anova_type)
 ```
 
@@ -215,13 +234,13 @@ summary(anova_type)
 # test 2: t-test - Are legendary Pokemon stronger?
 # Null hypothesis:legendary and non-legendary pokemon have the same mean total stats
 
-t.test(total_stats ~ is_legendary, data = poke_tidy)
+t.test(base_total ~ is_legendary, data = poke_tidy)
 ```
 
     ## 
     ##  Welch Two Sample t-test
     ## 
-    ## data:  total_stats by is_legendary
+    ## data:  base_total by is_legendary
     ## t = -19.268, df = 92.287, p-value < 2.2e-16
     ## alternative hypothesis: true difference in means between group FALSE and group TRUE is not equal to 0
     ## 95 percent confidence interval:
@@ -235,7 +254,7 @@ t.test(total_stats ~ is_legendary, data = poke_tidy)
 
 legend_model =
   glm (
-    is_legendary ~ total_stats + type1+ generation,
+    is_legendary ~ base_total + type1+ generation,
     data = poke_tidy, 
     family = "binomial"
   )
@@ -249,13 +268,13 @@ summary(legend_model)
 
     ## 
     ## Call:
-    ## glm(formula = is_legendary ~ total_stats + type1 + generation, 
+    ## glm(formula = is_legendary ~ base_total + type1 + generation, 
     ##     family = "binomial", data = poke_tidy)
     ## 
     ## Coefficients:
     ##                 Estimate Std. Error z value Pr(>|z|)    
     ## (Intercept)   -2.239e+01  2.767e+00  -8.093 5.80e-16 ***
-    ## total_stats    3.386e-02  4.245e-03   7.976 1.51e-15 ***
+    ## base_total     3.386e-02  4.245e-03   7.976 1.51e-15 ***
     ## type1Dark      2.736e-01  1.168e+00   0.234  0.81480    
     ## type1Dragon   -1.397e+00  1.141e+00  -1.224  0.22090    
     ## type1Electric  1.536e+00  1.029e+00   1.492  0.13558    
@@ -302,9 +321,6 @@ write_csv(poke_tidy, "Data/pokemon_clean.csv")
 ```
 
 ``` r
-library(randomForest)
-library(caret)
-
 #maria - Hypothesis testing
 
 # Can we predict Pokémon type from stats?
@@ -358,7 +374,7 @@ importance_scores = importance(type_model)
 varImpPlot(type_model, main = "Feature Importance for Type Prediction")
 ```
 
-<img src="serg_working_file_files/figure-gfm/unnamed-chunk-12-1.png" width="90%" />
+<img src="serg_working_file_files/figure-gfm/unnamed-chunk-11-1.png" width="90%" />
 
 ``` r
 # Type-specific accuracy
@@ -396,7 +412,7 @@ ggplot(type_accuracy_df,
 theme(legend.position = "bottom")
 ```
 
-<img src="serg_working_file_files/figure-gfm/unnamed-chunk-12-2.png" width="90%" />
+<img src="serg_working_file_files/figure-gfm/unnamed-chunk-11-2.png" width="90%" />
 
 The Random Forest model achieved 23.2% accuracy in predicting Pokémon
 primary type from base stats alone—4.1 times better than the 5.6%
@@ -995,11 +1011,11 @@ challenging to catch. To evaluate this relationship, we tested the
 following hypotheses:
 
 - H₀: There is no linear relationship between `capture_rate` and
-  `total_stats` among non-legendary Pokémon, after accounting for key
+  `base_total` among non-legendary Pokémon, after accounting for key
   demographic variables
 
 - H₁: There is a significant negative relationship between
-  `capture_rate` and `total_stats` (harder-to-catch Pokémon tend to be
+  `capture_rate` and `base_total` (harder-to-catch Pokémon tend to be
   stronger), after accounting for key demographic variables
 
 #### Measures
@@ -1098,7 +1114,7 @@ poke_2tt |>
   summarise(
     n = n(),
     mean_stat = mean(base_total, na.rm = TRUE),
-    sd_stat = sd(total_stats, na.rm = TRUE)
+    sd_stat = sd(base_total, na.rm = TRUE)
   )
 ```
 
@@ -1109,7 +1125,7 @@ poke_2tt |>
     ## 2 Single      384      409.    116.
 
 ``` r
-ggplot(poke_2tt, aes(x = dual_type, y = total_stats, fill = dual_type)) +
+ggplot(poke_2tt, aes(x = dual_type, y = base_total, fill = dual_type)) +
   geom_violin(trim = FALSE) +
   geom_boxplot(width = 0.2, alpha = 0.5) +
   labs(
@@ -1119,8 +1135,94 @@ ggplot(poke_2tt, aes(x = dual_type, y = total_stats, fill = dual_type)) +
   )
 ```
 
-<img src="serg_working_file_files/figure-gfm/unnamed-chunk-14-1.png" width="90%" />
+<img src="serg_working_file_files/figure-gfm/unnamed-chunk-13-1.png" width="90%" />
 
-## Two-Sample T-Test
+## A Two-Sample T-Test of Dual-Type vs Single-Type Pokémons
 
-WRITE UP
+We next examined whether dual-type Pokémon have a statistical advantage
+over single type Pokémon in terms of overall combat strengthe. More
+specifically, we wanted to test whether the total base stats differ
+between single_type and dual-type Pokémons.
+
+The following analysis will explore these hypotheses:
+
+- H₀: There is no difference in mean `base_total` between single-type
+  and dual-type Pokémon
+
+- H₁: There is a difference in mean `base_total` between single-type and
+  dual-type Pokémon
+
+#### Measures
+
+We first created a binary type variable (i.e., `dual_type`), where we
+recoded observations as **Single** for Pokémon with only a primary type
+(i.e., `type2 == "None"`) and **Dual** for those with both primary and
+secondary types. Our outcome variable, `base_total`, represents the sum
+of each Pokemon’s six base stats, including `hp`, `attack`, `defense`,
+`sp_attack`, `sp_defense`, and `speed`, which will serve as a proxy to
+measure overall combat potential.
+
+To compare mean `base_total` between single type and dual type species,
+we used a two-sample t-test, which allows for unequal variances, with
+`base_total` as the continuous outcome and `dual_typ` as the grouping
+variable. We also plotted the distribution of total stats using violin
+and boxplots to assess overlap and spread between both groups.
+
+#### Results
+
+On average, Dual-type Pokémon had higher total base stats than
+single-type Pokémon, as evidenced by a mean of 445.9 compared to 409.9.
+The difference of about 36.5 points higher tell us there results were
+statistically significant, as noted below:
+
+- t = 4.39
+- df = 796.5
+- p = 1.30 × 10^5
+- 95% CI: 20.2 to 52.9
+
+Given these results and because the confidence interval does not include
+the value of zero and the p-value is far below 0.05%, we reject the null
+hypothesis that there are no mean differences between single-type and
+dual-type Pokémons. These results show that dual-type species tend to
+have higher base total stats than those with only one type.
+
+#### Visualization Interpretation & Conclusions
+
+To visualize the distribution of total base stats between dual-type and
+single-type Pokémons, **a violin, box-plot was created**. As noted on
+the plot, we see that the distribution for dual-type Pokémons shifted
+upwards, indicating higher median and a denser cluster of higher-stat
+Pokémon than those with a single-type. Both groups, however, do show
+variability, with dual-type Pokémon dominating the upper half of the
+stat range. The overlap between both groups lets us know that type alone
+does not determine strengthen. However, we can conclude that the average
+advantage of dual-type Pokémons is consistent.
+
+Overall, although both groups do include strong and weak species, having
+two types is associated with a statistical advantage in overall combat
+potential. It is important to consider that generation design
+differences may play a role in this association, as later generations
+could emphasize duality in Pokémon species as more powerful, and, by
+extension, over better stat distribution. We can also conclude that
+having a second type offers more resistance and flexibility in combat
+against single-type Pokémons and could serve as advantage in moderating
+the effect of an effectiveness against one of the two types in dual-type
+Pokémons.
+
+# Project Report
+
+## 1. Motivation
+
+As lifelong Pokémon players,
+
+## 2. Initial questions:
+
+## 3. Data:
+
+### 3.1. Data source
+
+Our data source came from \[\]
+
+### 3.2. Data cleaning rocess
+
+### 3.3. Final dataset
