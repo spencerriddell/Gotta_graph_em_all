@@ -1,18 +1,35 @@
 ---
-title: "Serg's Project Working File"
+title: "Project Working File"
 author: "Sergio Ozoria"
 date: "2025-11-26"
 output: github_document
 ---
 
-# 1. Preparing variables
-
-```{r loading package}
+```{r loading package, message = FALSE}
 library(tidyverse)
+library(scales)
+library(viridis)
+library(randomForest)
+library(caret)
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = "90%"
+)
+
+theme_set(theme_minimal() + theme(legend.position = "bottom"))
+
+options(
+  ggplot2.continuous.colour = "viridis",
+  ggplot2.continuous.fill = "viridis"
+)
+
+scale_colour_discrete = scale_colour_viridis
 ```
 
 
-```{r}
+```{r cleaning up data, message = FALSE}
 #  serg - cleaning up name using snake format + concatenating missing values 
 poke_tidy = read_csv("./Data/pokemon.csv", na = c("NA", ".", "")) |> 
   janitor::clean_names()
@@ -52,21 +69,13 @@ poke_tidy = poke_tidy |>
 ```{r}
 # eman - convert  numeric columns
 
-poke_tidy=
+poke_tidy =
   poke_tidy |> 
   mutate(across(
     .cols = c(starts_with("against_"), "hp", "attack", "defense", "sp_attack", "sp_defense", "speed", "height_m", "weight_kg", "base_total"),
     .fns = as.numeric
   )) 
 
-```
-
-```{r}
-# eman - create total stats
-
-poke_tidy =
-  poke_tidy |> 
-  mutate(total_stats = hp + attack +defense + sp_attack + sp_defense + speed )
 ```
 
 ```{r}
@@ -82,28 +91,42 @@ poke_tidy =
 
 head(poke_tidy)
 
-ggplot(poke_tidy, aes(total_stats))+
+ggplot(poke_tidy, aes(base_total))+
   geom_histogram(bins = 30, fill = "skyblue", color = "black")+
   labs(title = "Distribution of Total Stats")
 ```
 
+## Ditstribution of Total Stats
+
+We first looked at the overall strength of all Pokemon by plotting the `base_total`. This helps us understand how strong mose pokemon are. The histogram shows that mnay pokemon fall in the middle range (from 300-550 total stats). Only a few Pokemon have very high stats (above 650), which makes sense because very strong Pokemon are rare. From this plot, we can see that the dataset includes both weak and strong Pokremon, and it's a good starting point before we compare groups or run hypothesis tests.
+
+
+
 ```{r}
 # eman - average total stats by type
 
-ggplot(poke_tidy, aes(type1, total_stats))+
+ggplot(poke_tidy, aes(type1, base_total))+
   geom_boxplot()+
   coord_flip()+
   labs(title = "Total Stats by Primary Type")
 ```
 
+## Total Stats by Primary Type
+
+We compared total stats across different Pokemon types to see if some types are usually stronger than others. The boxplot shows clear differences. Types like Dragon, Steel, and Psychic tend to have higher total stats. On the other hand, Bug, Normal, and Poison types usually have lower stats. Even though the ranges overlap, the medians are different enough to show that type does matter.This supports our later statistical test (ANOVA), which also found significant differences across types.
+
 ```{r}
 #eman - height vs weight colored by strength
 
-ggplot(poke_tidy, aes(height_m, weight_kg, color = total_stats))+
+ggplot(poke_tidy, aes(height_m, weight_kg, color = base_total))+
   geom_point(alpha = 0.6, size =2)+
   scale_color_viridis_c()+
   labs(title = "Height vs Weight (Colored by total stats")
 ```
+
+## Height vs. Weight Colored by Total Stats
+
+To see how physical characteristics relate to strength, we plotted each Pokemon's height and weight and colored the points by total stats. The plots shows that many of the heavier and taller Pokemon have higher stats (shown by the brighter colors). Smaller Pokemon have a wide range of stat values, meaning some are strong but many are not. This suggests that size does play a role in strength, although it is not the only factor. This is why we later include height and weight as covariates in the regression model.
 
 ```{r}
 # eman - hypothesis testing
@@ -111,7 +134,7 @@ ggplot(poke_tidy, aes(height_m, weight_kg, color = total_stats))+
 # Null hypothesis: mean total stats are equal across all types
 
 anova_type = 
-  aov(total_stats ~ type1, data = poke_tidy)
+  aov(base_total ~ type1, data = poke_tidy)
 summary(anova_type)
 ```
 
@@ -121,15 +144,22 @@ summary(anova_type)
 # test 2: t-test - Are legendary Pokemon stronger?
 # Null hypothesis:legendary and non-legendary pokemon have the same mean total stats
 
-t.test(total_stats ~ is_legendary, data = poke_tidy)
+t.test(base_total ~ is_legendary, data = poke_tidy)
 ```
+
+## Compating Strength Across Types and Legendary Status
+
+We then ran two hypothesis tests to compare Pokemon strength across groups. 
+First, the ANOVA showed that average total stats are different across Pokemon types (p<0.001). This matches what we saw in the boxplot, where some types clearly looked stronger than others. 
+Second, the t-test comparing legedary vs. non-legendary Pokemon showed that legendary Pokemon have much higher total stats. The difference was very significant. 
+These results tell us that both Pokemon type and legendary status are strongly related to how strong a Pokemon is. 
 
 ```{r}
 # eman - logistic regression (predicting legendary)
 
 legend_model =
   glm (
-    is_legendary ~ total_stats + type1+ generation,
+    is_legendary ~ base_total + type1+ generation,
     data = poke_tidy, 
     family = "binomial"
   )
@@ -140,6 +170,12 @@ poke_tidy$predicted_legendary =
 
 ```
 
+## Logistic Regression: Predicting Legendary Pokemon
+
+We ran a logistic regression to see whether we could predict if a Pokemon is legendary based on its total stats, type, and generation. This model helps us understand which characteristics are most strongly linked with legendary status. The results show that `base_total` is the strongest and most important predictor. As total stats increase, the probability of being legendary also increases. This makes sense, because legendary Pokemon are designed to be much stronger than regular Pokemon. 
+Most of the type variables were not significant, meaning that a Pokemon's type does not strongly determine whether it is legendary after we account for total stats. A few generations showed small effects, but these were not as strong as the effect of base_total. 
+Overall, the model supports what we expected: Stronger Pokemon are far more likely to be legendary, and total stats explain more of this difference.
+
 ```{r}
 #eman - saving clean dataset
 
@@ -148,9 +184,6 @@ write_csv(poke_tidy, "Data/pokemon_clean.csv")
 
 
 ```{r, warning=FALSE, message=FALSE}
-
-library(randomForest)
-library(caret)
 
 #maria - Hypothesis testing
 
@@ -245,9 +278,232 @@ Type-specific accuracy varied substantially. The easiest types to predict were N
 
 From a gameplay perspective, base stats provide useful but incomplete information about type identity. Players should consider both stat distributions and type matchups when building balanced teams.
 
+## Capture Rate vs Performance Analysis
+
+```{r capture rate & performance, warning = FALSE, message = FALSE}
+# Serg - Hypothesis testing using linear regression
+# RQ: Is there a relationship between capture rate and overall combat effectiveness?
+
+
+capture_stats <- poke_tidy |>
+  mutate(
+    capture_rate    = as.numeric(capture_rate),
+    percentage_male = as.numeric(percentage_male),
+    generation_grp  = case_when(
+      generation %in% c("1","2","3") ~ "Early",
+      generation %in% c("4","5","6","7") ~ "Modern",
+      TRUE ~ NA_character_
+    )
+  ) |>
+  mutate(
+    generation_grp = factor(generation_grp, levels = c("Early", "Modern"))
+  ) |>
+  filter(
+    is_legendary == FALSE,
+    !is.na(capture_rate),
+    !is.na(base_total),
+    !is.na(height_m),
+    !is.na(weight_kg),
+    !is.na(percentage_male),
+    !is.na(generation_grp)
+  )
+
+# Run linear regression
+capture_stats_lm <- lm(
+  base_total ~ capture_rate + height_m + 
+    weight_kg + percentage_male + generation_grp,
+  data = capture_stats
+)
+
+summary(capture_stats_lm)
+
+
+coef_table <- summary(capture_stats_lm)$coefficients |>
+  as.data.frame() |>
+  tibble::rownames_to_column("Predictor")
+
+knitr::kable(
+  coef_table,
+  digits = 3,
+  caption = "Regression: Capture Rate Predicting Total Base Stats"
+)
+```
 
 
 
+```{r}
+# Serg - Hypothesis testing using linear regression
+  # RQ: Is there a relationship between capture rate and overall combat effectiveness?
+
+# serg - selecting analytic sample + covariates
+
+library(gtsummary)
+library(sjPlot)
+
+capture_stats <- poke_tidy |>
+  mutate(
+    capture_rate = as.numeric(capture_rate),
+    percentage_male = as.numeric(percentage_male),
+    
+    generation = factor(
+      case_when(
+        generation %in% c("1","2","3") ~ "Early",
+        generation %in% c("4","5","6","7") ~ "Modern"
+      ),
+      levels = c("Early", "Modern")
+    )
+  ) |>
+  filter(
+    is_legendary == FALSE,
+    if_all(c(capture_rate, base_total, height_m,
+             percentage_male, weight_kg, generation), ~ !is.na(.x))
+  )
+  
+# running linear regression model
+
+capture_stats_lm = lm(
+  base_total ~ capture_rate + height_m + 
+    weight_kg + percentage_male + generation,
+  data = capture_stats
+)
+
+summary(capture_stats_lm)
+
+tbl_regression(
+  capture_stats_lm,
+  intercept = TRUE,
+  estimate_fun = ~ style_number(.x, digits = 2),
+  pvalue_fun = ~ style_pvalue(.x),
+  label = list(
+    capture_rate ~ "Capture Rate",
+    height_m ~ "Height (m)",
+    weight_kg ~ "Weight (kg)",
+    percentage_male ~ "Percentage Male",
+    generation ~ "Generation (ref = Early)"
+  )
+) |> 
+  modify_header(label = "**Predictors**")
+```
+
+#### Hypotheses
+
+As Pokémon data nerds, we were interested in examining whether a Pokemon's capture rate is related to its overall combat potential, which is relevant information for casual Pokémon players and competitive trainers. Thus, we examined whether Pokémon that are harder to catch tend to have higher base stat totals. 
+
+Our conceptual hypothesis is that performance contributes to capture difficulty, meaning that stronger Pokémon are designed to be more challenging to catch. To evaluate this relationship, we tested the following hypotheses:
+
+* H₀: There is no linear relationship between `capture_rate` and `base_total` among non-legendary Pokémon, after accounting for key demographic variables
+
+* H₁: There is a significant negative relationship between `capture_rate` and `base_total` (harder-to-catch Pokémon tend to be stronger), after accounting for key demographic variables
+
+#### Measures
+
+* Exposure (predictor):`capture_rate` represents how easy a Pokémon can be caught, meaning that higher values = easier to catch. This variable was cleaned and recoded as a numeric, continuous variable to correctly model the linear relationship and test our hypothesis.
+
+* Outcome (dependent): `base_total` is the sum of a Pokemon's six base total stats, including `hp`, `attack`, `defense`, `sp_attack`, `sp_defense`, and `speed`. This variable will serve as a proxy to assess overall combat effectiveness.  
+
+#### Covariates
+
+Several species-characteristics were included as covariates in the linear regression model to address potential confounding and improve model precision.
+These variables were chosen based on their plausible relationships with both `capture_rate` (main predictor) and `base_total` (main outcome of interest), as well as their relevancy to the universe design and any other factors that could bias our results. These covariates included:
+
+* `height_m`: This represents the physical size of the Pokémon. This variable was selected as a covariate because larger species could exhibit higher base stats and may have lower capture rates, making height a potential confounder. 
+* `weight_kg`: This represents the body mass index of the Pokémon. This variable was selected as a covariate because heavier Pokémon could have higher combat stats, as well as influence catch rate difficulty.
+* `percentage_male`: This represents the proportion of male species in the dataset.Some species may have sex-based differences when it comes to stats, so sex distribution could correlate with combat potential. This variable also helps account for any sex/gender related differences. 
+* `generation`: This represents the generation in which the Pokémon was first introduced. This variable was accounted for, as adjusting for it could control for systematic differences across generations due to temporal decision-making around stats or design based on generation. This variable was re-coded as a binary variable to capture contemporary differences across two chunks of Pokémon generations, where **Early** represents gens 1, 2, and 3, whereas **Modern** represents gens 4, 5, 6, and 7.
+
+Altogether, these covariates are meant to adjust for any potential differences across species, reduce biased estimates, and isolate the association between capture rate and overall base stats to assess combat effectiveness.
+
+#### Interpretation of regression analysis
+
+Among all non-legendary Pokémon included our cross-generational dataset of the Pokémon universe, we observed a significant negative association between `capture_rate` and `base_total`. More specifically, for every one-unit increase in `capture_rate`, meaning easier to catch, `base_total` decreased by about 0.87 points **(β = −0.87, 95% CI: −0.96, −0.79; p < 0.001)**. These results suggest that species designed to be harder to catch tend to possess higher combat power than those who are easier to catch.
+
+At the 5% significance level, the association between `capture_rate` and `base_total` is statistically significant, after adjusting for `height_m`, `weight_kg`, `percentage_male`, and `generation`. Therefore, we reject the null hypothesis that there is no linear relationship between the exposure and outcome of interest. 
+
+## A Two-Sample T-Test of Dual-Type vs Single-Type Pokémons
+
+```{r dual and single type t-test, message = FALSE}
+
+# serg - running two sample t test to explore whether dual-type pokemon have statistical advantages over single-type ones
+poke_2tt = poke_tidy |> 
+  mutate(
+    type2 = str_to_title(type2),
+    dual_type = if_else(type2 == "None", "Single", "Dual")
+  )
+
+tt_result = t.test(
+  base_total ~ dual_type,
+  data = poke_2tt,
+  var.equal = FALSE
+)
+
+tt_result
+
+poke_2tt |> 
+  group_by(dual_type) |> 
+  summarise(
+    n = n(),
+    mean_stat = mean(base_total, na.rm = TRUE),
+    sd_stat = sd(base_total, na.rm = TRUE)
+  )
+
+ggplot(poke_2tt, aes(x = dual_type, y = base_total, fill = dual_type)) +
+  geom_violin(trim = FALSE) +
+  geom_boxplot(width = 0.2, alpha = 0.5) +
+  labs(
+    x = "Pokémon Typing",
+    y = "Total Base Stats",
+    title = "Single-Type vs Dual-Type Pokémon: Total Stats Comparison"
+  )
+```
+
+#### Hypotheses
+
+We next examined whether dual-type Pokémon have a statistical advantage over single type Pokémon in terms of overall combat strengthe. More specifically, we wanted to test whether the total base stats differ between single_type and dual-type Pokémons. 
+
+The following analysis will explore these hypotheses:
+
+* H₀: There is no difference in mean `base_total` between single-type and dual-type Pokémon
+
+* H₁: There is a difference in mean `base_total` between single-type and dual-type Pokémon
+
+#### Measures
+
+We first created a binary type variable (i.e., `dual_type`), where we recoded observations as **Single** for Pokémon with only a primary type (i.e., `type2 == "None"`) and **Dual** for those with both primary and secondary types. Our outcome variable, `base_total`, represents the sum of each Pokemon's six base stats, including `hp`, `attack`, `defense`, `sp_attack`, `sp_defense`, and `speed`, which will serve as a proxy to measure overall combat potential.
 
 
+To compare mean `base_total` between single type and dual type species, we used a two-sample t-test, which allows for unequal variances, with `base_total` as the continuous outcome and `dual_typ` as the grouping variable. We also plotted the distribution of total stats using violin and boxplots to assess overlap and spread between both groups.
 
+#### Results
+
+On average, Dual-type Pokémon had higher total base stats than single-type Pokémon, as evidenced by a mean of 445.9 compared to 409.9. The difference of about 36.5 points higher tell us there results were statistically significant, as noted below:
+
+* t = 4.39
+* df = 796.5
+* p = 1.30 × 10^5
+* 95% CI: 20.2 to 52.9
+
+Given these results and because the confidence interval does not include the value of zero and the p-value is far below 0.05%, we reject the null hypothesis that there are no mean differences between single-type and dual-type Pokémons. These results show that dual-type species tend to have higher base total stats than those with only one type.
+
+#### Violin + Boxplot Interpretation & Conclusions
+
+To visualize the distribution of total base stats between dual-type and single-type Pokémons, **a violin, box-plot was created**. As noted on the plot, we see that the distribution for dual-type Pokémons shifted upwards, indicating higher median and a denser cluster of higher-stat Pokémon than those with a single-type. Both groups, however, do show variability, with dual-type Pokémon dominating the upper half of the stat range. The overlap between both groups lets us know that type alone does not determine strengthen. However, we can conclude that the average advantage of dual-type Pokémons is consistent.
+
+Overall, although both groups do include strong and weak species, having two types is associated with a statistical advantage in overall combat potential. It is important to consider that generation design differences may play a role in this association, as later generations could emphasize duality in Pokémon species as more powerful, and, by extension, over better stat distribution. We can also conclude that having a second type offers more resistance and flexibility in combat against single-type Pokémons and could serve as advantage in moderating the effect of an effectiveness against one of the two types in dual-type Pokémons.
+
+# Project Report
+
+## 1. Motivation
+
+As lifelong Pokémon players, 
+
+## 2. Initial questions:
+
+## 3. Data:
+
+### 3.1. Data source
+
+Our data source came from []
+
+### 3.2. Data cleaning rocess
+
+### 3.3. Final dataset

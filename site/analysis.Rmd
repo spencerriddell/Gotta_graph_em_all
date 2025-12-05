@@ -1,0 +1,79 @@
+---
+title: "Statistical and Machine Learning Analysis"
+output: html_document
+---
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(broom)
+library(caret)
+library(randomForest)
+theme_set(theme_minimal())
+```
+
+```{r data}
+poke <- readr::read_csv("Data/pokemon_clean.csv", show_col_types = FALSE) |>
+  mutate(
+    type1 = as.factor(type1),
+    generation = as.factor(generation),
+    is_legendary = as.logical(is_legendary)
+  )
+```
+
+## ANOVA: Do primary types differ in total base stats?
+
+```{r anova}
+anova_fit <- aov(base_total ~ type1, data = poke)
+anova_results <- broom::tidy(anova_fit)
+anova_results
+```
+
+## Two-sample t-test: Are legendary Pokémon stronger?
+
+```{r ttest}
+ttest_results <- t.test(base_total ~ is_legendary, data = poke)
+ttest_results
+```
+
+## Logistic regression: Predicting legendary status
+
+```{r logistic}
+glm_fit <- glm(
+  is_legendary ~ base_total + type1 + generation,
+  data = poke,
+  family = "binomial"
+)
+summary(glm_fit)
+```
+
+## Random Forest: Predicting primary type from base stats
+
+```{r rf, message=FALSE, warning=FALSE}
+set.seed(123)
+poke_type <- poke |>
+  select(type1, hp, attack, defense, sp_attack, sp_defense, speed) |>
+  mutate(type1 = factor(type1))
+
+idx <- createDataPartition(poke_type$type1, p = 0.8, list = FALSE)
+train <- poke_type[idx, ]
+test  <- poke_type[-idx, ]
+
+rf_fit <- randomForest(type1 ~ ., data = train, ntree = 500)
+pred   <- predict(rf_fit, newdata = test)
+
+acc <- mean(pred == test$type1)
+baseline <- 1/length(levels(train$type1))
+
+list(
+  Accuracy  = round(100*acc, 1),
+  Baseline  = round(100*baseline, 1),
+  Improvement_pts = round(100*(acc - baseline), 1)
+)
+```
+
+### Brief interpretation (to customize)
+
+- ANOVA: Inspect the p-value to assess differences in mean total stats across primary types.
+- t-test: Typically shows legendaries have higher total stats; confirm via mean difference and confidence interval.
+- Logistic regression: `base_total` often strongly predicts `is_legendary`; type and generation may add nuance.
+- Random Forest: Expect performance above the naive baseline; examine variable importance with `varImpPlot(rf_fit)` if desired.

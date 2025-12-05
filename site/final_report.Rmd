@@ -1,0 +1,46 @@
+---
+title: "Final Report"
+output: html_document
+---
+
+## Motivation
+
+Paste or adapt from your proposal (Pokemon.Rmd). For example:
+- Why this topic matters to players and analysts
+- What relationships you wanted to understand (type, stats, physical attributes, performance)
+
+## Research Questions
+
+- RQ1: How do physical traits (height, weight) relate to base stats?
+- RQ2: Which primary types tend to have stronger overall stats?
+- RQ3: What predicts whether a Pokémon is legendary?
+- RQ4: Can we predict primary type from base stats?
+
+## Data
+
+- Source: Kaggle Complete Pokémon Dataset (802 Pokémon across generations)
+- Key fields used: types, HP/Attack/Defense/Sp.Atk/Sp.Def/Speed, height_m, weight_kg, generation, legendary
+- Cleaning summary: see serg_working_file.Rmd for full steps; final data saved to Data/pokemon_clean.csv
+
+## Methods (high level)
+
+- EDA with interactive Plotly charts
+- Hypothesis testing (ANOVA, t-test)
+- Modeling (logistic regression for legendary status; Random Forest for type prediction)
+
+## Results (summary)
+
+- Summarize key statistical findings and model performance
+- Reference specific figures from the EDA and Analysis pages
+
+## Discussion
+
+- Interpretation in gameplay context
+- Limitations (e.g., data coverage, rarity/type imbalance)
+- Future work (e.g., matchup matrices, team builder, generational trends)
+
+## References
+
+- Kaggle dataset
+- [Pokémon DB Type Chart](https://pokemondb.net/type)
+- Any other online or academic references used

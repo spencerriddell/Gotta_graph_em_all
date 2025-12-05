@@ -1,0 +1,143 @@
+---
+title: "Exploratory Data Analysis"
+output: html_document
+---
+
+```{r setup, message=FALSE, warning=FALSE}
+library(tidyverse)
+library(plotly)
+theme_set(theme_minimal())
+```
+
+```{r data, message=FALSE}
+# Prefer the cleaned dataset already saved by the team
+poke <- readr::read_csv("Data/pokemon_clean.csv", show_col_types = FALSE) |>
+  mutate(
+    type1 = as.factor(type1),
+    type2 = as.factor(type2),
+    name  = as.character(name)
+  )
+
+# Helper for rich hover text
+poke <- poke |>
+  mutate(
+    hover = paste0(
+      "<b>", name, "</b>",
+      "<br>Primary: ", type1,
+      "<br>Secondary: ", ifelse(is.na(type2) | type2 == "None", "—", as.character(type2)),
+      "<br>Total: ", base_total
+    )
+  )
+```
+
+## Distribution of Total Stats (interactive dots)
+
+```{r dist-dots}
+set.seed(1)
+y_jitter <- jitter(rep(0, nrow(poke)), amount = 0.08)
+
+p1 <- plot_ly(
+  data = poke,
+  x = ~base_total,
+  y = ~y_jitter,
+  type = "scatter",
+  mode = "markers",
+  text = ~hover,
+  hoverinfo = "text",
+  marker = list(size = 7, opacity = 0.7, color = ~as.factor(type1))
+) |>
+  layout(
+    title = "Distribution of Pokémon Total Base Stats",
+    xaxis = list(title = "Total Base Stats"),
+    yaxis = list(title = "", showticklabels = FALSE),
+    showlegend = FALSE
+  )
+
+p1
+```
+
+## Total Stats by Primary Type (interactive dropdown)
+
+This chart lets you select a primary type to focus on. Hover shows the Pokémon name and types.
+
+```{r by-type-dropdown}
+types <- sort(unique(as.character(poke$type1)))
+
+# Build one trace per type plus an "All Types" trace
+traces <- list(
+  list(
+    name  = "All Types",
+    x     = poke$base_total,
+    y     = jitter(rep(0, nrow(poke)), amount = 0.1),
+    text  = poke$hover,
+    type  = "scatter",
+    mode  = "markers",
+    marker= list(size = 7, opacity = 0.7, color = I("#555555"))
+  )
+)
+
+for (tp in types) {
+  sub <- dplyr::filter(poke, type1 == tp)
+  traces[[length(traces) + 1]] <- list(
+    name  = tp,
+    x     = sub$base_total,
+    y     = jitter(rep(0, nrow(sub)), amount = 0.1),
+    text  = sub$hover,
+    type  = "scatter",
+    mode  = "markers",
+    marker= list(size = 7, opacity = 0.85)
+  )
+}
+
+# Visibility: start with "All Types" visible
+visible_init <- c(TRUE, rep(FALSE, length(types)))
+
+# Buttons: one for "All Types" and one per type
+buttons <- list(
+  list(
+    method = "update",
+    label  = "All Types",
+    args   = list(list(visible = c(TRUE, rep(FALSE, length(types)))),
+                  list(title = "Total Base Stats by Primary Type: All"))
+  )
+)
+
+for (i in seq_along(types)) {
+  vis <- c(FALSE, rep(FALSE, length(types)))
+  vis[i + 1] <- TRUE  # turn on the i-th type trace
+  buttons[[length(buttons) + 1]] <- list(
+    method = "update",
+    label  = types[i],
+    args   = list(list(visible = vis),
+                  list(title = paste("Total Base Stats by Primary Type:", types[i])))
+  )
+}
+
+p2 <- plot_ly()
+for (tr in traces) {
+  p2 <- add_trace(p2, !!!tr)
+}
+
+p2 <- layout(
+  p2,
+  title  = "Total Base Stats by Primary Type: All",
+  xaxis  = list(title = "Total Base Stats"),
+  yaxis  = list(title = "", showticklabels = FALSE),
+  updatemenus = list(
+    list(
+      type = "dropdown",
+      direction = "down",
+      x = 0.01, y = 1.08,
+      showactive = TRUE,
+      buttons = buttons
+    )
+  ),
+  showlegend = FALSE
+)
+
+p2
+```
+
+Notes:
+- Both charts are client-side interactive and work on GitHub Pages (no Shiny runtime required).
+- Data source: Data/pokemon_clean.csv (from your existing pipeline).

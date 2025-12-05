@@ -1,0 +1,14 @@
+---
+title: "Contact Us"
+output: html_document
+---
+
+Have questions or suggestions? Reach out to the team:
+
+- Sergio Ozoria Ramirez — GitHub: <https://github.com/smo2147>
+- Maria Beg — GitHub: <https://github.com/mb5357>
+- Eman Ibrahim — GitHub: <https://github.com/ei2291>
+- Spencer Riddell — GitHub: <https://github.com/swr2118>
+
+You can also open an issue in our repository:  
+<https://github.com/mb5357/Gotta_graph_em_all/issues>

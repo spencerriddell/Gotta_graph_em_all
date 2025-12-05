@@ -1,0 +1,38 @@
+name: "Gotta Graph ’Em All"
+title: "Gotta Graph ’Em All"
+output_dir: "docs"
+
+navbar:
+  left:
+    - text: "About our Trainers"
+      href: index.html
+    - text: "Exploratory Data Analysis"
+      href: eda.html
+    - text: "Statistical & ML Analysis"
+      href: analysis.html
+    - text: "Final Report"
+      href: final_report.html
+    - text: "Contact Us"
+      href: contact.html
+  right:
+    - icon: fa-github
+      href: https://github.com/mb5357/Gotta_graph_em_all
+
+# Exclude working files from the site build
+exclude:
+  - "serg_working_file.Rmd"
+  - "serg_working_file.md"
+  - "serg_working_file_files"
+  - "Pokemon.Rmd"
+  - "Pokemon.md"
+  - "README.md"
+  - ".DS_Store"
+
+output:
+  html_document:
+    theme: cosmo
+    toc: true
+    toc_float: true
+    number_sections: false
+    df_print: paged
+    css: assets/style.css

@@ -1,0 +1,161 @@
+/* Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Montserrat:wght@400;600;800&display=swap');
+
+:root {
+  --pk-yellow: #FFCB05;
+  --pk-blue:   #3D7DCA;
+  --pk-red:    #FF1C1C;
+  --pk-black:  #111111;
+  --pk-gray:   #f1f3f7;
+  --pk-white:  #ffffff;
+}
+
+html, body {
+  background: var(--pk-gray);
+  color: var(--pk-black);
+  font-family: "Montserrat", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+  line-height: 1.6;
+}
+
+/* Headings: retro arcade style */
+h1, h2, h3 {
+  font-family: "Press Start 2P", cursive;
+  color: var(--pk-yellow);
+  letter-spacing: 0.5px;
+  text-shadow:
+    2px 2px 0 #000,
+    -2px 2px 0 #000,
+    2px -2px 0 #000,
+    -2px -2px 0 #000;
+  margin-top: 1.2em;
+}
+
+h4, h5, h6 {
+  font-weight: 800;
+  color: var(--pk-blue);
+}
+
+/* Navbar */
+.navbar {
+  background: linear-gradient(90deg, var(--pk-blue) 0%, #2a6db0 50%, var(--pk-yellow) 100%) !important;
+  border-bottom: 4px solid #000;
+}
+
+.navbar .navbar-brand,
+.navbar .navbar-nav > li > a {
+  color: #fff !important;
+}
+
+.navbar .navbar-brand {
+  font-family: "Press Start 2P", cursive;
+  color: var(--pk-yellow) !important;
+  text-shadow: 2px 2px 0 #000;
+  letter-spacing: 0.5px;
+}
+
+.navbar .navbar-nav > li > a:hover {
+  color: var(--pk-black) !important;
+  text-shadow: 1px 1px 0 rgba(255,255,255,0.4);
+}
+
+/* Links and buttons */
+a { color: var(--pk-blue); }
+a:hover, a:focus { color: var(--pk-red); text-decoration: none; }
+
+.btn-primary {
+  background-color: var(--pk-red);
+  border-color: #b40f0f;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.btn-primary:hover { background-color: #d71414; border-color: #a10c0c; }
+
+/* Panels, cards, and general containers */
+.panel, .well, .card, .rmdnote, .rmdwarning {
+  border: 3px solid #000;
+  border-radius: 12px;
+  box-shadow: 6px 6px 0 #00000020;
+}
+
+/* TOC styling */
+.tocify, .tocify-wrapper {
+  background: var(--pk-white);
+  border: 3px solid #000;
+  border-radius: 12px;
+}
+
+.tocify .tocify-item > a {
+  font-weight: 600;
+}
+
+/* Code blocks */
+pre, code, kbd, samp {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+pre {
+  background: #0b1020;
+  color: #f3f7ff;
+  border-radius: 8px;
+  border: 2px solid #000;
+}
+
+/* Horizontal rule */
+hr {
+  border: 0;
+  border-top: 4px solid var(--pk-blue);
+  margin: 2rem 0;
+}
+
+/* Plotly canvas background nudge */
+.js-plotly-plot, .plotly, .plot-container {
+  background: var(--pk-white) !important;
+}
+
+/* Hero section and trainer cards */
+.hero {
+  background:
+    radial-gradient(circle at 20% 25%, rgba(255,203,5,0.25), transparent 40%),
+    radial-gradient(circle at 80% 30%, rgba(61,125,202,0.18), transparent 45%),
+    var(--pk-white);
+  border: 4px solid #000;
+  border-radius: 14px;
+  padding: 24px;
+  text-align: center;
+  box-shadow: 8px 8px 0 #00000030;
+  margin-bottom: 24px;
+}
+
+.trainer-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+  align-items: start;
+}
+
+.trainer-card {
+  background: var(--pk-white);
+  border: 3px solid #000;
+  border-radius: 12px;
+  padding: 16px;
+  text-align: center;
+  box-shadow: 6px 6px 0 #00000020;
+}
+
+.trainer-card img {
+  border: 3px solid #000;
+  border-radius: 8px;
+  width: 180px;
+  height: 180px;
+  object-fit: cover;
+}
+
+/* Tables */
+table.table, .table {
+  background: var(--pk-white);
+  border: 2px solid #000;
+}
+.table > thead > tr > th {
+  background: #e9f0fb;
+  border-bottom: 2px solid #000;
+  font-weight: 800;
+}
