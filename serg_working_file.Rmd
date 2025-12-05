@@ -95,6 +95,11 @@ ggplot(poke_tidy, aes(base_total))+
   geom_histogram(bins = 30, fill = "skyblue", color = "black")+
   labs(title = "Distribution of Total Stats")
 ```
+## Ditstribution of Total Stats
+
+We first looked at the overall strength of all Pokemon by plotting the `base_total`. This helps us understand how strong mose pokemon are. The histogram shows that mnay pokemon fall in the middle range (from 300-550 total stats). Only a few Pokemon have very high stats (above 650), which makes sense because very strong Pokemon are rare. From this plot, we can see that the dataset includes both weak and strong Pokremon, and it's a good starting point before we compare groups or run hypothesis tests.
+
+
 
 ```{r}
 # eman - average total stats by type
@@ -250,6 +255,57 @@ Variable importance analysis reveals that Special Attack, Attack and Speed are t
 Type-specific accuracy varied substantially. The easiest types to predict were Normal (61.9%), Fighting (40%), and Fire (40%), likely because these types have distinctive stat profiles. In contrast, several types such as Fairy, Ghost, Ground, Ice, Poison, and Rock had 0% accuracy, reflecting high overlap in stat distributions with other types. This explains why the overall model accuracy (~23%) is moderate, many Pokémon share similar stats despite different types.
 
 From a gameplay perspective, base stats provide useful but incomplete information about type identity. Players should consider both stat distributions and type matchups when building balanced teams.
+
+
+```{r}
+# Serg - Hypothesis testing using linear regression
+# RQ: Is there a relationship between capture rate and overall combat effectiveness?
+
+
+capture_stats <- poke_tidy |>
+  mutate(
+    capture_rate    = as.numeric(capture_rate),
+    percentage_male = as.numeric(percentage_male),
+    generation_grp  = case_when(
+      generation %in% c("1","2","3") ~ "Early",
+      generation %in% c("4","5","6","7") ~ "Modern",
+      TRUE ~ NA_character_
+    )
+  ) |>
+  mutate(
+    generation_grp = factor(generation_grp, levels = c("Early", "Modern"))
+  ) |>
+  filter(
+    is_legendary == FALSE,
+    !is.na(capture_rate),
+    !is.na(base_total),
+    !is.na(height_m),
+    !is.na(weight_kg),
+    !is.na(percentage_male),
+    !is.na(generation_grp)
+  )
+
+# Run linear regression
+capture_stats_lm <- lm(
+  base_total ~ capture_rate + height_m + 
+    weight_kg + percentage_male + generation_grp,
+  data = capture_stats
+)
+
+summary(capture_stats_lm)
+
+
+coef_table <- summary(capture_stats_lm)$coefficients |>
+  as.data.frame() |>
+  tibble::rownames_to_column("Predictor")
+
+knitr::kable(
+  coef_table,
+  digits = 3,
+  caption = "Regression: Capture Rate Predicting Total Base Stats"
+)
+```
+
 
 
 ```{r}
