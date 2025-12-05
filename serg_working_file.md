@@ -5,6 +5,7 @@ Sergio Ozoria
 
 ``` r
 library(tidyverse)
+<<<<<<< HEAD
 ```
 
     ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
@@ -19,34 +20,12 @@ library(tidyverse)
     ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
 
 ``` r
+=======
+>>>>>>> 3eaafaaec0b1de50a6b7b85852bbbfb181638c73
 library(scales)
-```
-
-    ## 
-    ## Attaching package: 'scales'
-    ## 
-    ## The following object is masked from 'package:purrr':
-    ## 
-    ##     discard
-    ## 
-    ## The following object is masked from 'package:readr':
-    ## 
-    ##     col_factor
-
-``` r
 library(viridis)
-```
-
-    ## Loading required package: viridisLite
-    ## 
-    ## Attaching package: 'viridis'
-    ## 
-    ## The following object is masked from 'package:scales':
-    ## 
-    ##     viridis_pal
-
-``` r
 library(randomForest)
+<<<<<<< HEAD
 ```
 
     ## Warning: package 'randomForest' was built under R version 4.5.2
@@ -65,9 +44,11 @@ library(randomForest)
     ##     margin
 
 ``` r
+=======
+>>>>>>> 3eaafaaec0b1de50a6b7b85852bbbfb181638c73
 library(caret)
-```
 
+<<<<<<< HEAD
     ## Warning: package 'caret' was built under R version 4.5.2
 
     ## Loading required package: lattice
@@ -79,6 +60,8 @@ library(caret)
     ##     lift
 
 ``` r
+=======
+>>>>>>> 3eaafaaec0b1de50a6b7b85852bbbfb181638c73
 knitr::opts_chunk$set(
   fig.width = 6,
   fig.asp = .6,
@@ -99,18 +82,7 @@ scale_colour_discrete = scale_colour_viridis
 #  serg - cleaning up name using snake format + concatenating missing values 
 poke_tidy = read_csv("./Data/pokemon.csv", na = c("NA", ".", "")) |> 
   janitor::clean_names()
-```
 
-    ## Rows: 801 Columns: 41
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## chr  (7): abilities, capture_rate, classfication, japanese_name, name, type1...
-    ## dbl (34): against_bug, against_dark, against_dragon, against_electric, again...
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-``` r
 # serg - replacing missing type 2 with none
 poke_tidy = poke_tidy |> 
   mutate(
@@ -190,6 +162,7 @@ ggplot(poke_tidy, aes(base_total))+
   labs(title = "Distribution of Total Stats")
 ```
 
+<<<<<<< HEAD
 <img src="serg_working_file_files/figure-gfm/unnamed-chunk-4-1.png" width="90%" />
 \## Ditstribution of Total Stats
 
@@ -200,6 +173,9 @@ total stats). Only a few Pokemon have very high stats (above 650), which
 makes sense because very strong Pokemon are rare. From this plot, we can
 see that the dataset includes both weak and strong Pokremon, and it’s a
 good starting point before we compare groups or run hypothesis tests.
+=======
+<img src="serg_working_file_files/figure-gfm/unnamed-chunk-3-1.png" width="90%" />
+>>>>>>> 3eaafaaec0b1de50a6b7b85852bbbfb181638c73
 
 ``` r
 # eman - average total stats by type
@@ -210,7 +186,7 @@ ggplot(poke_tidy, aes(type1, base_total))+
   labs(title = "Total Stats by Primary Type")
 ```
 
-<img src="serg_working_file_files/figure-gfm/unnamed-chunk-5-1.png" width="90%" />
+<img src="serg_working_file_files/figure-gfm/unnamed-chunk-4-1.png" width="90%" />
 
 ## Total Stats by Primary Type
 
@@ -235,7 +211,7 @@ ggplot(poke_tidy, aes(height_m, weight_kg, color = base_total))+
     ## Warning: Removed 20 rows containing missing values or values outside the scale range
     ## (`geom_point()`).
 
-<img src="serg_working_file_files/figure-gfm/unnamed-chunk-6-1.png" width="90%" />
+<img src="serg_working_file_files/figure-gfm/unnamed-chunk-5-1.png" width="90%" />
 
 ## Height vs. Weight Colored by Total Stats
 
@@ -436,7 +412,7 @@ importance_scores = importance(type_model)
 varImpPlot(type_model, main = "Feature Importance for Type Prediction")
 ```
 
-<img src="serg_working_file_files/figure-gfm/unnamed-chunk-11-1.png" width="90%" />
+<img src="serg_working_file_files/figure-gfm/unnamed-chunk-10-1.png" width="90%" />
 
 ``` r
 # Type-specific accuracy
@@ -474,7 +450,7 @@ ggplot(type_accuracy_df,
 theme(legend.position = "bottom")
 ```
 
-<img src="serg_working_file_files/figure-gfm/unnamed-chunk-11-2.png" width="90%" />
+<img src="serg_working_file_files/figure-gfm/unnamed-chunk-10-2.png" width="90%" />
 
 The Random Forest model achieved 23.2% accuracy in predicting Pokémon
 primary type from base stats alone—4.1 times better than the 5.6%
@@ -515,6 +491,8 @@ many Pokémon share similar stats despite different types.
 From a gameplay perspective, base stats provide useful but incomplete
 information about type identity. Players should consider both stat
 distributions and type matchups when building balanced teams.
+
+## Capture Rate vs Performance Analysis
 
 ``` r
 # Serg - Hypothesis testing using linear regression
@@ -616,11 +594,13 @@ Regression: Capture Rate Predicting Total Base Stats
 
 library(gtsummary)
 library(sjPlot)
-```
 
+<<<<<<< HEAD
     ## Warning: package 'sjPlot' was built under R version 4.5.2
 
 ``` r
+=======
+>>>>>>> 3eaafaaec0b1de50a6b7b85852bbbfb181638c73
 capture_stats <- poke_tidy |>
   mutate(
     capture_rate = as.numeric(capture_rate),
@@ -639,14 +619,7 @@ capture_stats <- poke_tidy |>
     if_all(c(capture_rate, base_total, height_m,
              percentage_male, weight_kg, generation), ~ !is.na(.x))
   )
-```
-
-    ## Warning: There was 1 warning in `mutate()`.
-    ## ℹ In argument: `capture_rate = as.numeric(capture_rate)`.
-    ## Caused by warning:
-    ## ! NAs introduced by coercion
-
-``` r
+  
 # running linear regression model
 
 capture_stats_lm = lm(
@@ -1146,7 +1119,7 @@ tbl_regression(
 </table>
 </div>
 
-## Capture Rate vs Performance Analysis
+#### Hypotheses
 
 As Pokémon data nerds, we were interested in examining whether a
 Pokemon’s capture rate is related to its overall combat potential, which
@@ -1205,6 +1178,10 @@ covariates included:
   first introduced. This variable was accounted for, as adjusting for it
   could control for systematic differences across generations due to
   temporal decision-making around stats or design based on generation.
+  This variable was re-coded as a binary variable to capture
+  contemporary differences across two chunks of Pokémon generations,
+  where **Early** represents gens 1, 2, and 3, whereas **Modern**
+  represents gens 4, 5, 6, and 7.
 
 Altogether, these covariates are meant to adjust for any potential
 differences across species, reduce biased estimates, and isolate the
@@ -1227,6 +1204,8 @@ At the 5% significance level, the association between `capture_rate` and
 `height_m`, `weight_kg`, `percentage_male`, and `generation`. Therefore,
 we reject the null hypothesis that there is no linear relationship
 between the exposure and outcome of interest.
+
+## A Two-Sample T-Test of Dual-Type vs Single-Type Pokémons
 
 ``` r
 # serg - running two sample t test to explore whether dual-type pokemon have statistical advantages over single-type ones
@@ -1284,9 +1263,13 @@ ggplot(poke_2tt, aes(x = dual_type, y = base_total, fill = dual_type)) +
   )
 ```
 
+<<<<<<< HEAD
 <img src="serg_working_file_files/figure-gfm/unnamed-chunk-14-1.png" width="90%" />
+=======
+<img src="serg_working_file_files/figure-gfm/dual and single type t-test-1.png" width="90%" />
+>>>>>>> 3eaafaaec0b1de50a6b7b85852bbbfb181638c73
 
-## A Two-Sample T-Test of Dual-Type vs Single-Type Pokémons
+#### Hypotheses
 
 We next examined whether dual-type Pokémon have a statistical advantage
 over single type Pokémon in terms of overall combat strengthe. More
@@ -1335,7 +1318,7 @@ hypothesis that there are no mean differences between single-type and
 dual-type Pokémons. These results show that dual-type species tend to
 have higher base total stats than those with only one type.
 
-#### Visualization Interpretation & Conclusions
+#### Violin + Boxplot Interpretation & Conclusions
 
 To visualize the distribution of total base stats between dual-type and
 single-type Pokémons, **a violin, box-plot was created**. As noted on
