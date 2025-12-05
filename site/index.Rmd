@@ -1,0 +1,54 @@
+---
+title: "About our Trainers"
+output: html_document
+---
+
+<div class="hero">
+  <h1>Gotta Graph ’Em All</h1>
+  <p style="margin: 0.5rem 0 0;">Data science adventures in the Pokémon universe</p>
+</div>
+
+Welcome to Gotta Graph ’Em All! Meet the team behind the analysis.
+
+<div class="trainer-grid">
+
+<div class="trainer-card">
+  <a href="https://github.com/smo2147" target="_blank" rel="noopener">
+    <img src="https://github.com/smo2147.png?size=240" alt="Sergio Ozoria Ramirez"/>
+  </a>
+  <h3 style="margin-top: 10px;">Sergio Ozoria Ramirez</h3>
+  <p><a href="https://github.com/smo2147" target="_blank" rel="noopener">github.com/smo2147</a></p>
+  <p><em>Bio:</em> Add a short bio here (background, interests, role on the project).</p>
+</div>
+
+<div class="trainer-card">
+  <a href="https://github.com/mb5357" target="_blank" rel="noopener">
+    <img src="https://github.com/mb5357.png?size=240" alt="Maria Beg"/>
+  </a>
+  <h3 style="margin-top: 10px;">Maria Beg</h3>
+  <p><a href="https://github.com/mb5357" target="_blank" rel="noopener">github.com/mb5357</a></p>
+  <p><em>Bio:</em> Add a short bio here (background, interests, role on the project).</p>
+</div>
+
+<div class="trainer-card">
+  <a href="https://github.com/ei2291" target="_blank" rel="noopener">
+    <img src="https://github.com/ei2291.png?size=240" alt="Eman Ibrahim"/>
+  </a>
+  <h3 style="margin-top: 10px;">Eman Ibrahim</h3>
+  <p><a href="https://github.com/ei2291" target="_blank" rel="noopener">github.com/ei2291</a></p>
+  <p><em>Bio:</em> Add a short bio here (background, interests, role on the project).</p>
+</div>
+
+<div class="trainer-card">
+  <a href="https://github.com/swr2118" target="_blank" rel="noopener">
+    <img src="https://github.com/swr2118.png?size=240" alt="Spencer Riddell"/>
+  </a>
+  <h3 style="margin-top: 10px;">Spencer Riddell</h3>
+  <p><a href="https://github.com/swr2118" target="_blank" rel="noopener">github.com/swr2118</a></p>
+  <p><em>Bio:</em> Add a short bio here (background, interests, role on the project).</p>
+</div>
+
+</div>
+
+Tips:
+- Replace avatars with team photos by adding images to an images/ folder and swapping the img src.
