@@ -110,6 +110,10 @@ ggplot(poke_tidy, aes(type1, base_total))+
   labs(title = "Total Stats by Primary Type")
 ```
 
+## Total Stats by Primary Type
+
+We compared total stats across different Pokemon types to see if some types are usually stronger than others. The boxplot shows clear differences. Types like Dragon, Steel, and Psychic tend to have higher total stats. On the other hand, Bug, Normal, and Poison types usually have lower stats. Even though the ranges overlap, the medians are different enough to show that type does matter.  
+
 ```{r}
 #eman - height vs weight colored by strength
 
