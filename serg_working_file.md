@@ -5,63 +5,20 @@ Sergio Ozoria
 
 ``` r
 library(tidyverse)
-<<<<<<< HEAD
-```
-
-    ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-    ## ✔ dplyr     1.1.4     ✔ readr     2.1.5
-    ## ✔ forcats   1.0.0     ✔ stringr   1.5.1
-    ## ✔ ggplot2   3.5.2     ✔ tibble    3.3.0
-    ## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-    ## ✔ purrr     1.0.4     
-    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-    ## ✖ dplyr::filter() masks stats::filter()
-    ## ✖ dplyr::lag()    masks stats::lag()
-    ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
-
-``` r
-=======
->>>>>>> 3eaafaaec0b1de50a6b7b85852bbbfb181638c73
 library(scales)
 library(viridis)
 library(randomForest)
-<<<<<<< HEAD
 ```
 
     ## Warning: package 'randomForest' was built under R version 4.5.2
 
-    ## randomForest 4.7-1.2
-    ## Type rfNews() to see new features/changes/bug fixes.
-    ## 
-    ## Attaching package: 'randomForest'
-    ## 
-    ## The following object is masked from 'package:dplyr':
-    ## 
-    ##     combine
-    ## 
-    ## The following object is masked from 'package:ggplot2':
-    ## 
-    ##     margin
-
 ``` r
-=======
->>>>>>> 3eaafaaec0b1de50a6b7b85852bbbfb181638c73
 library(caret)
+```
 
-<<<<<<< HEAD
     ## Warning: package 'caret' was built under R version 4.5.2
 
-    ## Loading required package: lattice
-    ## 
-    ## Attaching package: 'caret'
-    ## 
-    ## The following object is masked from 'package:purrr':
-    ## 
-    ##     lift
-
 ``` r
-=======
->>>>>>> 3eaafaaec0b1de50a6b7b85852bbbfb181638c73
 knitr::opts_chunk$set(
   fig.width = 6,
   fig.asp = .6,
@@ -162,8 +119,7 @@ ggplot(poke_tidy, aes(base_total))+
   labs(title = "Distribution of Total Stats")
 ```
 
-<<<<<<< HEAD
-<img src="serg_working_file_files/figure-gfm/unnamed-chunk-4-1.png" width="90%" />
+<img src="serg_working_file_files/figure-gfm/unnamed-chunk-3-1.png" width="90%" />
 \## Ditstribution of Total Stats
 
 We first looked at the overall strength of all Pokemon by plotting the
@@ -173,9 +129,6 @@ total stats). Only a few Pokemon have very high stats (above 650), which
 makes sense because very strong Pokemon are rare. From this plot, we can
 see that the dataset includes both weak and strong Pokremon, and it’s a
 good starting point before we compare groups or run hypothesis tests.
-=======
-<img src="serg_working_file_files/figure-gfm/unnamed-chunk-3-1.png" width="90%" />
->>>>>>> 3eaafaaec0b1de50a6b7b85852bbbfb181638c73
 
 ``` r
 # eman - average total stats by type
@@ -521,14 +474,7 @@ capture_stats <- poke_tidy |>
     !is.na(percentage_male),
     !is.na(generation_grp)
   )
-```
 
-    ## Warning: There was 1 warning in `mutate()`.
-    ## ℹ In argument: `capture_rate = as.numeric(capture_rate)`.
-    ## Caused by warning:
-    ## ! NAs introduced by coercion
-
-``` r
 # Run linear regression
 capture_stats_lm <- lm(
   base_total ~ capture_rate + height_m + 
@@ -594,13 +540,11 @@ Regression: Capture Rate Predicting Total Base Stats
 
 library(gtsummary)
 library(sjPlot)
+```
 
-<<<<<<< HEAD
     ## Warning: package 'sjPlot' was built under R version 4.5.2
 
 ``` r
-=======
->>>>>>> 3eaafaaec0b1de50a6b7b85852bbbfb181638c73
 capture_stats <- poke_tidy |>
   mutate(
     capture_rate = as.numeric(capture_rate),
@@ -619,7 +563,14 @@ capture_stats <- poke_tidy |>
     if_all(c(capture_rate, base_total, height_m,
              percentage_male, weight_kg, generation), ~ !is.na(.x))
   )
-  
+```
+
+    ## Warning: There was 1 warning in `mutate()`.
+    ## ℹ In argument: `capture_rate = as.numeric(capture_rate)`.
+    ## Caused by warning:
+    ## ! NAs introduced by coercion
+
+``` r
 # running linear regression model
 
 capture_stats_lm = lm(
@@ -1263,11 +1214,7 @@ ggplot(poke_2tt, aes(x = dual_type, y = base_total, fill = dual_type)) +
   )
 ```
 
-<<<<<<< HEAD
-<img src="serg_working_file_files/figure-gfm/unnamed-chunk-14-1.png" width="90%" />
-=======
 <img src="serg_working_file_files/figure-gfm/dual and single type t-test-1.png" width="90%" />
->>>>>>> 3eaafaaec0b1de50a6b7b85852bbbfb181638c73
 
 #### Hypotheses
 
