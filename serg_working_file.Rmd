@@ -403,7 +403,7 @@ On average, Dual-type Pokémon had higher total base stats than single-type Pok�
 
 Given these results and because the confidence interval does not include the value of zero and the p-value is far below 0.05%, we reject the null hypothesis that there are no mean differences between single-type and dual-type Pokémons. These results show that dual-type species tend to have higher base total stats than those with only one type.
 
-#### Visualization Interpretation & Conclusions
+#### Violin + Boxplot Interpretation & Conclusions
 
 To visualize the distribution of total base stats between dual-type and single-type Pokémons, **a violin, box-plot was created**. As noted on the plot, we see that the distribution for dual-type Pokémons shifted upwards, indicating higher median and a denser cluster of higher-stat Pokémon than those with a single-type. Both groups, however, do show variability, with dual-type Pokémon dominating the upper half of the stat range. The overlap between both groups lets us know that type alone does not determine strengthen. However, we can conclude that the average advantage of dual-type Pokémons is consistent.
 

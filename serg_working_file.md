@@ -1098,7 +1098,7 @@ hypothesis that there are no mean differences between single-type and
 dual-type Pokémons. These results show that dual-type species tend to
 have higher base total stats than those with only one type.
 
-#### Visualization Interpretation & Conclusions
+#### Violin + Boxplot Interpretation & Conclusions
 
 To visualize the distribution of total base stats between dual-type and
 single-type Pokémons, **a violin, box-plot was created**. As noted on
