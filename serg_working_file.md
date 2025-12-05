@@ -239,6 +239,15 @@ ggplot(poke_tidy, aes(height_m, weight_kg, color = base_total))+
 
 ## Height vs. Weight Colored by Total Stats
 
+To see how physical characteristics relate to strength, we plotted each
+Pokemon’s height and weight and colored the points by total stats. The
+plots shows that many of the heavier and taller Pokemon have higher
+stats (shown by the brighter colors). Smaller Pokemon have a wide range
+of stat values, meaning some are strong but many are not. This suggests
+that size does play a role in strength, although it is not the only
+factor. This is why we later include height and weight as covariates in
+the regression model.
+
 ``` r
 # eman - hypothesis testing
 # test 1: ANOVA - Do types differ in strength?
