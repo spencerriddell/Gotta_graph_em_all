@@ -5,7 +5,7 @@ date: "2025-11-26"
 output: github_document
 ---
 
-```{r loading package}
+```{r loading package, message = FALSE}
 library(tidyverse)
 library(scales)
 library(viridis)
@@ -29,7 +29,7 @@ scale_colour_discrete = scale_colour_viridis
 ```
 
 
-```{r}
+```{r cleaning up data, message = FALSE}
 #  serg - cleaning up name using snake format + concatenating missing values 
 poke_tidy = read_csv("./Data/pokemon.csv", na = c("NA", ".", "")) |> 
   janitor::clean_names()
@@ -252,7 +252,7 @@ Type-specific accuracy varied substantially. The easiest types to predict were N
 From a gameplay perspective, base stats provide useful but incomplete information about type identity. Players should consider both stat distributions and type matchups when building balanced teams.
 
 
-```{r}
+```{r capture rate & performance, warning = FALSE, message = FALSE}
 # Serg - Hypothesis testing using linear regression
   # RQ: Is there a relationship between capture rate and overall combat effectiveness?
 
@@ -330,7 +330,7 @@ These variables were chosen based on their plausible relationships with both `ca
 * `height_m`: This represents the physical size of the Pokémon. This variable was selected as a covariate because larger species could exhibit higher base stats and may have lower capture rates, making height a potential confounder. 
 * `weight_kg`: This represents the body mass index of the Pokémon. This variable was selected as a covariate because heavier Pokémon could have higher combat stats, as well as influence catch rate difficulty.
 * `percentage_male`: This represents the proportion of male species in the dataset.Some species may have sex-based differences when it comes to stats, so sex distribution could correlate with combat potential. This variable also helps account for any sex/gender related differences. 
-* `generation`: This represents the generation in which the Pokémon was first introduced. This variable was accounted for, as adjusting for it could control for systematic differences across generations due to temporal decision-making around stats or design based on generation.
+* `generation`: This represents the generation in which the Pokémon was first introduced. This variable was accounted for, as adjusting for it could control for systematic differences across generations due to temporal decision-making around stats or design based on generation. This variable was re-coded as a binary variable to capture contemporary differences across two chunks of Pokémon generations, where **Early** represents gens 1, 2, and 3, whereas **Modern** represents gens 4, 5, 6, and 7.
 
 Altogether, these covariates are meant to adjust for any potential differences across species, reduce biased estimates, and isolate the association between capture rate and overall base stats to assess combat effectiveness.
 
@@ -340,7 +340,7 @@ Among all non-legendary Pokémon included our cross-generational dataset of the 
 
 At the 5% significance level, the association between `capture_rate` and `base_total` is statistically significant, after adjusting for `height_m`, `weight_kg`, `percentage_male`, and `generation`. Therefore, we reject the null hypothesis that there is no linear relationship between the exposure and outcome of interest. 
 
-```{r}
+```{r dual and single type t-test, message = FALSE}
 
 # serg - running two sample t test to explore whether dual-type pokemon have statistical advantages over single-type ones
 poke_2tt = poke_tidy |> 

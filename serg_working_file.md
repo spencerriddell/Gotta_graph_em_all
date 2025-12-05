@@ -5,76 +5,11 @@ Sergio Ozoria
 
 ``` r
 library(tidyverse)
-```
-
-    ## ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-    ## ✔ dplyr     1.1.4     ✔ readr     2.1.5
-    ## ✔ forcats   1.0.1     ✔ stringr   1.6.0
-    ## ✔ ggplot2   4.0.0     ✔ tibble    3.3.0
-    ## ✔ lubridate 1.9.4     ✔ tidyr     1.3.1
-    ## ✔ purrr     1.2.0     
-    ## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-    ## ✖ dplyr::filter() masks stats::filter()
-    ## ✖ dplyr::lag()    masks stats::lag()
-    ## ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
-
-``` r
 library(scales)
-```
-
-    ## 
-    ## Attaching package: 'scales'
-    ## 
-    ## The following object is masked from 'package:purrr':
-    ## 
-    ##     discard
-    ## 
-    ## The following object is masked from 'package:readr':
-    ## 
-    ##     col_factor
-
-``` r
 library(viridis)
-```
-
-    ## Loading required package: viridisLite
-    ## 
-    ## Attaching package: 'viridis'
-    ## 
-    ## The following object is masked from 'package:scales':
-    ## 
-    ##     viridis_pal
-
-``` r
 library(randomForest)
-```
-
-    ## randomForest 4.7-1.2
-    ## Type rfNews() to see new features/changes/bug fixes.
-    ## 
-    ## Attaching package: 'randomForest'
-    ## 
-    ## The following object is masked from 'package:dplyr':
-    ## 
-    ##     combine
-    ## 
-    ## The following object is masked from 'package:ggplot2':
-    ## 
-    ##     margin
-
-``` r
 library(caret)
-```
 
-    ## Loading required package: lattice
-    ## 
-    ## Attaching package: 'caret'
-    ## 
-    ## The following object is masked from 'package:purrr':
-    ## 
-    ##     lift
-
-``` r
 knitr::opts_chunk$set(
   fig.width = 6,
   fig.asp = .6,
@@ -95,18 +30,7 @@ scale_colour_discrete = scale_colour_viridis
 #  serg - cleaning up name using snake format + concatenating missing values 
 poke_tidy = read_csv("./Data/pokemon.csv", na = c("NA", ".", "")) |> 
   janitor::clean_names()
-```
 
-    ## Rows: 801 Columns: 41
-    ## ── Column specification ────────────────────────────────────────────────────────
-    ## Delimiter: ","
-    ## chr  (7): abilities, capture_rate, classfication, japanese_name, name, type1...
-    ## dbl (34): against_bug, against_dark, against_dragon, against_electric, again...
-    ## 
-    ## ℹ Use `spec()` to retrieve the full column specification for this data.
-    ## ℹ Specify the column types or set `show_col_types = FALSE` to quiet this message.
-
-``` r
 # serg - replacing missing type 2 with none
 poke_tidy = poke_tidy |> 
   mutate(
@@ -186,7 +110,7 @@ ggplot(poke_tidy, aes(base_total))+
   labs(title = "Distribution of Total Stats")
 ```
 
-<img src="serg_working_file_files/figure-gfm/unnamed-chunk-4-1.png" width="90%" />
+<img src="serg_working_file_files/figure-gfm/unnamed-chunk-3-1.png" width="90%" />
 
 ``` r
 # eman - average total stats by type
@@ -197,7 +121,7 @@ ggplot(poke_tidy, aes(type1, base_total))+
   labs(title = "Total Stats by Primary Type")
 ```
 
-<img src="serg_working_file_files/figure-gfm/unnamed-chunk-5-1.png" width="90%" />
+<img src="serg_working_file_files/figure-gfm/unnamed-chunk-4-1.png" width="90%" />
 
 ``` r
 #eman - height vs weight colored by strength
@@ -211,7 +135,7 @@ ggplot(poke_tidy, aes(height_m, weight_kg, color = base_total))+
     ## Warning: Removed 20 rows containing missing values or values outside the scale range
     ## (`geom_point()`).
 
-<img src="serg_working_file_files/figure-gfm/unnamed-chunk-6-1.png" width="90%" />
+<img src="serg_working_file_files/figure-gfm/unnamed-chunk-5-1.png" width="90%" />
 
 ``` r
 # eman - hypothesis testing
@@ -374,7 +298,7 @@ importance_scores = importance(type_model)
 varImpPlot(type_model, main = "Feature Importance for Type Prediction")
 ```
 
-<img src="serg_working_file_files/figure-gfm/unnamed-chunk-11-1.png" width="90%" />
+<img src="serg_working_file_files/figure-gfm/unnamed-chunk-10-1.png" width="90%" />
 
 ``` r
 # Type-specific accuracy
@@ -412,7 +336,7 @@ ggplot(type_accuracy_df,
 theme(legend.position = "bottom")
 ```
 
-<img src="serg_working_file_files/figure-gfm/unnamed-chunk-11-2.png" width="90%" />
+<img src="serg_working_file_files/figure-gfm/unnamed-chunk-10-2.png" width="90%" />
 
 The Random Forest model achieved 23.2% accuracy in predicting Pokémon
 primary type from base stats alone—4.1 times better than the 5.6%
@@ -462,16 +386,7 @@ distributions and type matchups when building balanced teams.
 
 library(gtsummary)
 library(sjPlot)
-```
 
-    ## 
-    ## Attaching package: 'sjPlot'
-
-    ## The following object is masked from 'package:ggplot2':
-    ## 
-    ##     set_theme
-
-``` r
 capture_stats <- poke_tidy |>
   mutate(
     capture_rate = as.numeric(capture_rate),
@@ -490,14 +405,7 @@ capture_stats <- poke_tidy |>
     if_all(c(capture_rate, base_total, height_m,
              percentage_male, weight_kg, generation), ~ !is.na(.x))
   )
-```
-
-    ## Warning: There was 1 warning in `mutate()`.
-    ## ℹ In argument: `capture_rate = as.numeric(capture_rate)`.
-    ## Caused by warning:
-    ## ! NAs introduced by coercion
-
-``` r
+  
 # running linear regression model
 
 capture_stats_lm = lm(
@@ -1056,6 +964,10 @@ covariates included:
   first introduced. This variable was accounted for, as adjusting for it
   could control for systematic differences across generations due to
   temporal decision-making around stats or design based on generation.
+  This variable was re-coded as a binary variable to capture
+  contemporary differences across two chunks of Pokémon generations,
+  where **Early** represents gens 1, 2, and 3, whereas **Modern**
+  represents gens 4, 5, 6, and 7.
 
 Altogether, these covariates are meant to adjust for any potential
 differences across species, reduce biased estimates, and isolate the
@@ -1135,7 +1047,7 @@ ggplot(poke_2tt, aes(x = dual_type, y = base_total, fill = dual_type)) +
   )
 ```
 
-<img src="serg_working_file_files/figure-gfm/unnamed-chunk-13-1.png" width="90%" />
+<img src="serg_working_file_files/figure-gfm/dual and single type t-test-1.png" width="90%" />
 
 ## A Two-Sample T-Test of Dual-Type vs Single-Type Pokémons
 
