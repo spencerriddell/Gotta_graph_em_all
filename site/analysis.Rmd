@@ -59,7 +59,19 @@ poke <- readr::read_csv("Data/pokemon_clean.csv", show_col_types = FALSE) |>
   )
 ```
 
-## ANOVA: Do primary types differ in total base stats?
+## Do primary types differ in total base stats?
+
+#### Hypotheses:
+
+We examined whether mean total base stats differ across primary Pokémon types.
+
+- H₀: Mean base_total is equal across all primary types.
+- H₁: At least one primary type has a different mean base_total.
+
+#### Measures
+
+- Grouping: type1 (primary type).
+- Outcome: base_total (sum of HP, Attack, Defense, Sp. Attack, Sp. Defense, Speed). We fit a one-way ANOVA and followed with Tukey post-hoc tests to identify which pairs of types differ.
 
 ```{r anova}
 anova_fit <- aov(base_total ~ type1, data = poke)
@@ -94,8 +106,8 @@ ggplot(poke, aes(type1, base_total, fill = type1)) +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
-```{r tukey-table}
-# Tukey post-hoc table, simplified labels and significance
+```{r tukey-results, include=FALSE}
+# Tukey post-hoc results (kept for plotting and a brief summary)
 tuk <- TukeyHSD(anova_fit)
 tuk_raw <- broom::tidy(tuk)
 
@@ -103,30 +115,18 @@ tuk_tidy <- tuk_raw |>
   mutate(
     Type_A      = sub("-.*$", "", contrast),
     Type_B      = sub(".*-", "", contrast),
-    `Mean Diff` = round(estimate, 2),
-    `CI Low`    = round(conf.low, 2),
-    `CI High`   = round(conf.high, 2),
-    `Adj p`     = scales::pvalue(adj.p.value),
+    `Mean Diff` = estimate,
+    `CI Low`    = conf.low,
+    `CI High`   = conf.high,
     Significant = adj.p.value < 0.05
-  ) |>
-  arrange(adj.p.value)  # arrange BEFORE selecting/renaming away adj.p.value
+  )
 
-gt_tbl <- gt_compact(
-  tuk_tidy |> select(Type_A, Type_B, `Mean Diff`, `CI Low`, `CI High`, `Adj p`, Significant),
-  title = "Tukey HSD Post-hoc: Pairwise Type Differences",
-  subtitle = "Pairs sorted by adjusted p-value; Significant = adj p < 0.05"
-) |>
-  tab_style(
-    style = cell_fill(color = "#fff5f5"),
-    locations = cells_body(rows = Significant)
-  ) |>
-  fmt_markdown(columns = "Significant")
-
-gt_tbl
+sig_count <- sum(tuk_tidy$Significant, na.rm = TRUE)
+total_pairs <- nrow(tuk_tidy)
 ```
 
 ```{r tukey-plot-sig}
-# Significant-only plot with type colors for Type B
+# Visualize ONLY significant Tukey differences with type colors (by Type B)
 tukey_sig_df <- tuk_tidy |>
   filter(Significant) |>
   mutate(
@@ -142,15 +142,126 @@ ggplot(tukey_sig_df,
   geom_point(size = 2.6) +
   scale_color_manual(values = type_cols, guide = guide_legend(title = "Type B")) +
   labs(
-    title = "Significant Tukey Differences (adj p < 0.05)",
-    subtitle = "Intervals colored by Type B in the contrast (B - A)",
+    title = "Significant Tukey Post-hoc Differences (adj p < 0.05)",
+    subtitle = paste0(sig_count, " significant pairs out of ", total_pairs, " total comparisons"),
     x = "Mean Difference in Total Base Stats (B - A)",
     y = "Type Pair (B - A)"
   ) +
   theme(legend.position = "top")
 ```
 
-## Two-sample t-test: Are legendary Pokémon stronger?
+#### Results 
+
+The ANOVA indicated significant differences in mean total base stats across primary types. The Tukey summary plot highlights the specific pairs with significant differences and their effect directions. Together, these results show that type is associated with systematic variation in base_total.
+
+#### Interpretation 
+
+While distributions overlap across types, several pairwise differences are statistically meaningful, consistent with design patterns where certain types (e.g., Dragon, Steel) tend to have stronger stat profiles. This supports using type as an informative factor in downstream modeling and interpretation.
+
+## Are dual-type Pokémon stronger than single-type Pokémon?
+
+#### Hypotheses
+
+We examined whether dual-type Pokémon have a statistical advantage over single-type Pokémon in terms of overall combat strength. Specifically, we tested whether mean total base stats differ between Single-type and Dual-type Pokémon.
+
+- H₀: There is no difference in mean base_total between Single-type and Dual-type Pokémon.
+- H₁: There is a difference in mean base_total between Single-type and Dual-type Pokémon.
+
+#### Measures
+
+- Grouping: dual_type is “Single” when type2 == "None", otherwise “Dual”.
+- Outcome: base_total is the sum of HP, Attack, Defense, Sp. Attack, Sp. Defense, and Speed.
+
+We conducted a Welch two-sample t-test (allowing unequal variances) and visualized the distributions using violin and boxplots.
+
+```{r dualtype-setup, include=FALSE}
+library(broom)
+library(gt)
+library(tidyverse)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+
+# Helper to render compact gt tables
+gt_compact <- function(df, title = NULL, subtitle = NULL) {
+  gt::gt(df) |>
+    gt::tab_header(title = gt::md(title %||% ""), subtitle = gt::md(subtitle %||% "")) |>
+    gt::opt_row_striping() |>
+    gt::cols_align(align = "left", columns = gt::everything()) |>
+    gt::tab_options(
+      table.font.names = c("Montserrat", "system-ui", "-apple-system", "Arial", "sans-serif"),
+      table.width = gt::px(760),
+      heading.align = "left"
+    ) |>
+    gt::fmt_missing(columns = gt::everything(), missing_text = "—")
+}
+`%||%` <- function(x, y) if (is.null(x)) y else x
+```
+
+```{r dualtype-data}
+# Use the cleaned dataset already loaded earlier in the page as `poke`
+dual_df <- poke |>
+  mutate(
+    type2 = stringr::str_to_title(type2),
+    dual_type = if_else(type2 == "None", "Single", "Dual")
+  )
+```
+
+```{r dualtype-test}
+tt_dual <- t.test(base_total ~ dual_type, data = dual_df, var.equal = FALSE)
+tt_dual_tidy <- broom::tidy(tt_dual) |>
+  transmute(
+    `Mean Diff (Dual - Single)` = round(estimate, 2),
+    `95% CI Low`  = round(conf.low, 2),
+    `95% CI High` = round(conf.high, 2),
+    `p-value`     = scales::pvalue(p.value)
+  )
+
+group_summary <- dual_df |>
+  group_by(dual_type) |>
+  summarise(
+    N          = n(),
+    `Mean Total` = round(mean(base_total, na.rm = TRUE), 1),
+    `SD Total`   = round(sd(base_total, na.rm = TRUE), 1),
+    .groups = "drop"
+  ) |>
+  arrange(desc(dual_type))
+
+gt_compact(group_summary, title = "Group Summary: Single vs Dual-type", subtitle = "Total Base Stats by typing (means and SDs)")
+gt_compact(tt_dual_tidy, title = "Two-sample t-test", subtitle = "Outcome: Total Base Stats; Grouping: Dual vs Single")
+```
+
+```{r dualtype-viz}
+ggplot(dual_df, aes(x = dual_type, y = base_total, fill = dual_type)) +
+  geom_violin(trim = FALSE, alpha = 0.55) +
+  geom_boxplot(width = 0.20, alpha = 0.55, outlier.alpha = 0.35) +
+  scale_fill_manual(values = c("Single" = "#6390F0", "Dual" = "#EE8130"), guide = "none") +
+  labs(
+    x = "Typing",
+    y = "Total Base Stats",
+    title = "Single-type vs Dual-type Pokémon: Total Stats Comparison"
+  )
+```
+
+#### Results
+
+On average, Dual-type Pokémon have higher total base stats than Single-type Pokémon. The mean difference, confidence interval, and p-value are shown in the t-test table above. Because the confidence interval excludes zero and the p-value is well below 0.05 in our dataset, we reject H₀ and conclude Dual-type Pokémon tend to have higher total base stats than Single-type Pokémon.
+
+#### Interpretation
+
+The violin+boxplot shows the Dual-type distribution shifted upward relative to Single-type, indicating a higher median and denser cluster among higher stats. There is overlap between groups, so typing alone doesn’t determine strength, but the average advantage of Dual-type is consistent. Generation design could play a role (e.g., later generations may emphasize dual typing), and battle mechanics suggest dual typing provides resistance and flexibility—potentially reflected in higher overall base stats.
+
+## Are legendary Pokémon stronger?
+
+#### Hypotheses:
+
+We tested whether legendary Pokémon have higher mean total base stats than non-legendary Pokémon.
+
+- H₀: Mean base_total is equal between legendary and non-legendary Pokémon.
+- H₁: Mean base_total differs between legendary and non-legendary Pokémon.
+
+#### Measures
+
+- Grouping: is_legendary (TRUE/FALSE).
+- Outcome: base_total (sum of six base stats). We conducted a two-sample t-test and visualized distributions with density overlays.
 
 ```{r ttest}
 tt <- t.test(base_total ~ is_legendary, data = poke)
@@ -190,7 +301,127 @@ ggplot(poke, aes(base_total, fill = is_legendary)) +
   theme(legend.position = "top")
 ```
 
-## Logistic regression: Predicting legendary status
+#### Results 
+
+Legendary Pokémon exhibit substantially higher mean base_total compared to non-legendary. The confidence interval excludes zero and the p-value is far below 0.05, supporting rejection of H₀.
+
+#### Interpretation 
+
+The density plot shows the legendary distribution shifted toward higher totals, consistent with franchise design choices that make legendaries stronger on average. This motivates logistic regression using base_total and other predictors to model legendary status.
+
+## Are stronger Pokémon harder to catch?
+
+#### Hypotheses
+
+- H₀: No linear relationship between capture_rate and base_total among non-legendary Pokémon after adjusting for covariates.
+- H₁: A significant negative relationship exists: harder-to-catch Pokémon (lower capture_rate) have higher base_total, controlling for covariates.
+
+#### Measures and covariates
+
+- Exposure: capture_rate (numeric; higher = easier to catch).
+- Outcome: base_total (sum of HP, Attack, Defense, Sp. Attack, Sp. Defense, Speed).
+- Covariates: Height (m), Weight (kg), Percentage Male, Generation group (Early vs Modern).
+
+```{r capture-rate-setup, include=FALSE}
+library(broom)
+library(gt)
+library(tidyverse)
+
+# compact gt helper (reuses your existing style)
+gt_compact <- function(df, title = NULL, subtitle = NULL) {
+  gt::gt(df) |>
+    gt::tab_header(title = gt::md(title %||% ""), subtitle = gt::md(subtitle %||% "")) |>
+    gt::opt_row_striping() |>
+    gt::cols_align(align = "left", columns = gt::everything()) |>
+    gt::tab_options(
+      table.font.names = c("Montserrat", "system-ui", "-apple-system", "Arial", "sans-serif"),
+      table.width = gt::px(760),
+      heading.align = "left"
+    ) |>
+    gt::fmt_missing(columns = gt::everything(), missing_text = "—")
+}
+`%||%` <- function(x, y) if (is.null(x)) y else x
+```
+
+```{r capture-rate-data}
+# Build analysis sample and covariates
+capture_stats <- poke |>
+  filter(!is_legendary) |>
+  mutate(
+    capture_rate    = suppressWarnings(as.numeric(capture_rate)),
+    percentage_male = suppressWarnings(as.numeric(percentage_male)),
+    generation_grp  = case_when(
+      generation %in% c("1","2","3") ~ "Early",
+      generation %in% c("4","5","6","7") ~ "Modern",
+      TRUE ~ NA_character_
+    )
+  ) |>
+  mutate(generation_grp = factor(generation_grp, levels = c("Early", "Modern"))) |>
+  filter(if_all(c(capture_rate, base_total, height_m, weight_kg, percentage_male, generation_grp), ~ !is.na(.x)))
+```
+
+```{r capture-rate-model}
+# Linear regression: total stats ~ capture rate + size + sex + generation group
+lm_fit <- lm(
+  base_total ~ capture_rate + height_m + weight_kg + percentage_male + generation_grp,
+  data = capture_stats
+)
+
+lm_tidy <- broom::tidy(lm_fit, conf.int = TRUE) |>
+  mutate(
+    term = recode(term,
+      "(Intercept)"          = "Intercept",
+      "capture_rate"         = "Capture Rate (higher = easier)",
+      "height_m"             = "Height (m)",
+      "weight_kg"            = "Weight (kg)",
+      "percentage_male"      = "Percentage Male",
+      "generation_grpModern" = "Generation: Modern (vs Early)"
+    )
+  ) |>
+  transmute(
+    Predictor = term,
+    Estimate  = round(estimate, 2),
+    `95% CI Low`  = round(conf.low, 2),
+    `95% CI High` = round(conf.high, 2),
+    `p-value`     = scales::pvalue(p.value)
+  )
+
+gt_compact(lm_tidy,
+  title = "Regression: Capture Rate Predicting Total Base Stats (non-legendary)",
+  subtitle = "Model adjusts for Height, Weight, Percentage Male, and Generation group"
+)
+```
+
+```{r capture-rate-plot}
+# Visualization: relationship with fitted line (partial, not residualized)
+ggplot(capture_stats, aes(capture_rate, base_total)) +
+  geom_point(alpha = 0.45, color = "#1976d2") +
+  geom_smooth(method = "lm", se = TRUE, color = "#c22e28") +
+  labs(
+    title = "Capture Rate vs Total Base Stats (non-legendary)",
+    subtitle = "Higher capture_rate means easier to catch",
+    x = "Capture Rate",
+    y = "Total Base Stats"
+  )
+```
+
+#### Interpretation
+
+The regression table shows a significant negative coefficient for Capture Rate, indicating that, among non-legendary Pokémon, species that are harder to catch tend to have higher total base stats, even after adjusting for physical size, sex distribution, and generation group. The plot illustrates the overall downward trend. This supports rejecting H₀ in favor of H₁.
+
+## Can we predict legendary status from stats, type and generation?
+
+#### Hypotheses:
+
+We modeled whether a Pokémon is legendary based on total stats, primary type, and generation.
+
+- H₀: base_total, type1, and generation are not associated with legendary status.
+- H₁: At least one of base_total, type1, or generation is associated with legendary status.
+
+#### Measures
+
+- Outcome: is_legendary (binary; TRUE/FALSE).
+- Predictors: base_total (numeric), type1 (categorical), generation (categorical). We fit a logistic regression and reported exponentiated coefficients (odds ratios) with confidence intervals. Model discrimination was evaluated via ROC curve and AUC, and calibration via predicted vs observed rates in deciles.
 
 ```{r logistic}
 glm_fit <- glm(
@@ -256,7 +487,27 @@ ggplot(calib_df, aes(`Mean Pred`, `Empirical Rate`)) +
        x = "Mean Predicted Probability (bin)", y = "Empirical Legendary Rate")
 ```
 
-## Random Forest: Predicting primary type from base stats
+#### Results 
+
+The odds ratios indicate that base_total is a strong positive predictor of legendary status, with higher totals substantially increasing the odds that a Pokémon is legendary. Type and generation effects are smaller and more nuanced, with some categories contributing modest shifts. The ROC AUC demonstrates good discrimination between legendary and non‑legendary classes, and the calibration plot shows predicted probabilities align reasonably with empirical rates.
+
+#### Interpretation 
+
+Total base stats are the dominant signal for legendary designation, reflecting the franchise’s design that legendaries are stronger on average. Type and generation provide secondary context that can refine predictions but play a smaller role than total stats. Overall, the model effectively distinguishes legendary from non‑legendary Pokémon and is well‑calibrated for interpretation.
+
+## Can we predict primary type from base stats?
+
+#### Hypotheses:
+
+We assessed whether base stats alone can predict a Pokémon’s primary type better than chance.
+
+- H₀: Base stats provide no predictive power beyond chance for identifying primary type.
+- H₁: Base stats contain predictive signal for primary type classification.
+
+#### Measures
+
+- Outcome: type1 (categorical).
+- Predictors: hp, attack, defense, sp_attack, sp_defense, speed (numeric). We trained a Random Forest with an 80/20 train‑test split, reported test accuracy against a naive baseline (1 / number of types), inspected variable importance (Mean Decrease Gini), and visualized the confusion matrix to understand per‑type performance.
 
 ```{r rf}
 set.seed(123)
@@ -311,3 +562,11 @@ ggplot(cm_df, aes(Pred, Truth, fill = Freq)) +
   labs(title = "Random Forest Confusion Matrix (Test Set)", x = "Predicted Type", y = "True Type") +
   theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
+
+#### Results 
+
+Test accuracy exceeds the naive baseline, indicating that base stats contain meaningful type‑specific patterns. Variable importance highlights offensive attributes—especially Special Attack, Attack, and Speed—as the most influential predictors, with defensive stats contributing less. The confusion matrix shows strong performance for some types and confusions among types with overlapping stat profiles.
+
+#### Interpretation 
+
+Offensive profiles and speed tiers are more distinctive across types than defensive stats, consistent with battle mechanics where types often specialize in offense. Misclassifications tend to occur among types with similar stat distributions, explaining moderate overall accuracy despite robust signals for certain types. These findings support the idea that base stats encode type identity to a useful, but not perfect, degree.
