@@ -13,7 +13,7 @@
 
 <title>Final Report</title>
 
-<script src="site_libs/header-attrs-2.30/header-attrs.js"></script>
+<script src="site_libs/header-attrs-2.29/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
@@ -676,12 +676,119 @@ trends.</p></li>
 </div>
 <div id="results-summary" class="section level2">
 <h2>Results (Summary)</h2>
+<p><strong>Research Question 1: Predicting Pokemon Types from Base
+Stats</strong></p>
+<p>The Random Forest model reached 23.2% accuracy, which is much higher
+than the 5.6% baseline expected from randomly guessing among 18 possible
+types. This means that Pokemon base stats do contain real information
+about type, even though type alone cannot be predicted with very high
+precision.</p>
+<p>The most important predictors were Special Attach, Attack, and Speed,
+which suggests that offensive stats vary more consistently across types
+than defensive stats. Some type, such as Normal, Fighting, and Fire,
+were predicted with the highest accuracy (40-62%), while types with
+small sample sizes or overlapping stat patterns (such as Ghost, Ice,
+Fairy, Poison, Ground) had 0% accuracy.</p>
+<p>The results show that there are differences in types in stat
+distributions, but the overlap across types makes it impossible to make
+perfect prediction. Overall, the model performed significantly better
+than chance, which leads us to reject the null hypothesis and conclude
+that Pokemon types do differ systematically in their stat patterns.</p>
+<p><strong>Research Question 2: Do Dual-Type Pokemon Have Higher Total
+Base Stats?</strong></p>
+<p>The Welch two-sample t-test showed that dual-type Pokemon have
+significantly higher total base stats than single-type Pokemon.</p>
+<ul>
+<li>Mean (Dual-type): 445.9</li>
+<li>Mean (Single-type): 409.4</li>
+<li>Mean difference: 36.5</li>
+<li>t = 4.39, p = 1.30 x 10^-5</li>
+<li>95% CI: 20.2 to 52.9</li>
+</ul>
+<p>Because the confidence interval does not include zero and the p-value
+is far below 0.05, we reject the null hypothesis. This means dual-type
+Pokemon tend to be stronger on average when looking at total base
+stats.</p>
+<p>The violin and boxplots support this conclusion visually: dual-type
+Pokemon show higher median and a larger cluster of high-stat species,
+even though both groups have wide variation.</p>
+<p><strong>Research Question 3: Does Capture Rate Predict Combat
+Strength?</strong></p>
+<p>In our multiple linear regression (excluding legendary Pokemon), we
+found a strong and significant negative association between capture rate
+and total base stats, even after adjusting for height, weight,
+percentage male, and generation.</p>
+<p>Key results:</p>
+<ul>
+<li>β = -0.85, p &lt; 0.001</li>
+</ul>
+<p>This means that for every 1-unit increase in capture rate (meaning
+the Pokemon is easier to catch), the <code>base_total</code>decrease by
+about 0.85 points, holding all other variables constant.</p>
+<p>Other covariates (height, weight, and percentage male) were also
+statistically significant. suggesting that physical characteristics of
+Pokemon relate to overall combat power. Generation (Modern vs. Early)
+showed a smaller, borderline effect.</p>
+<p>The model explained about 56% of the variance in base stats (R^2 =
+0.56), meaning the predictors jointly capture a meaningful amount of
+variation in Pokemon strength.</p>
+<p>Given these results, we reject the null hypothesis and conclude that
+harder to catch Pokemon tend to be stronger, consistent with gameplay
+expectations.</p>
 </div>
 <div id="discussion" class="section level2">
 <h2>Discussion</h2>
+<p>Our findings across all three research questions demonstrate distinct
+and consistent patterns withing the Pokemon universe that align with
+both player intuition and formal statistical evidence.</p>
+<p>First, we discovered that Pokemon types show significant variations
+in their statistical distributions. The Random Forest model predicted
+type about four times better than chance, even though it couldn’t
+perfectly separate them. This suggests that Pokemon types follow certain
+design patterns, especially when it comes to offensive stats like
+Special Attack and Attack. This means that stats hold useful information
+about type identity, which could help players guess battle strengths
+even if they don’t know the type directly.</p>
+<p>Second, we saw that dual-type Pokemon have a big edge over
+single-type Pokemon when it comes to their total base stats. Both groups
+have a lot of strengths, but dual-types always have higher averages.
+This could be because the game designers wanted it that way. Dual typing
+gives you more strategic options (extra resistance and STAB coverage)
+and slightly higher stat budgets. These findings highlight the
+perception that dual-type Pokemon are more versatile and stronger in
+combat.</p>
+<p>Third, our regression analysis showed that Pokemon that are harder to
+catch tend to have higher total base stats, even after controlling for
+physical size, sex distribution, and generation. This is very similar to
+what happens in the game: rare species are usually made to be stronger.
+Height and weight were also positively correlated with base stats,
+supporting the notion that larger Pokemon tend to be more powerful. We
+verified that the inverse correlation between capture rate and combat
+strength is not merely attributable to variations in size or
+generation.</p>
+<p>In summary, our results show that Pokemon designs follow certain
+patterns. Strength is based on more than just typing and whether a
+Pokemon has one or two types. It also depends on how hard or rate it is
+to get. These results help explain many things long-time players have
+noticed, and they do so with clear statistical evidence. From a gameplay
+point-of-view, these insights can help with team building, strategic
+planning, and understanding the competition.</p>
+<p>Lastly, our analyses provide strong evidence for these connections,
+but there are some limitations: some types were underrepresented, making
+it harder to predict how well they would perform; the dataset also
+doesn’t include battle context variables, like movesets, abilities in
+action, and held items, that affect the outcome of real fights. Even
+with these limitations, our study shows how statistical modeling and
+machine learning can uncover important patterns and “hidden rules” in
+Pokemon design.</p>
 </div>
 <div id="references" class="section level2">
 <h2>References</h2>
+<ul>
+<li>Banik, R. (2018). Complete Pokémon Dataset. Kaggle. <a
+href="https://www.kaggle.com/datasets/rounakbanik/pokemon"
+class="uri">https://www.kaggle.com/datasets/rounakbanik/pokemon</a></li>
+</ul>
 </div>
 
 
