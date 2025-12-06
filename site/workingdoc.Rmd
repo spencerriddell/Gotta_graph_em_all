@@ -106,7 +106,6 @@ ggplot(poke_tidy, aes(base_total))+
 We first looked at the overall strength of all Pokemon by plotting the `base_total`. This helps us understand how strong mose pokemon are. The histogram shows that mnay pokemon fall in the middle range (from 300-550 total stats). Only a few Pokemon have very high stats (above 650), which makes sense because very strong Pokemon are rare. From this plot, we can see that the dataset includes both weak and strong Pokremon, and it's a good starting point before we compare groups or run hypothesis tests.
 
 
-
 ```{r}
 # eman - average total stats by type
 
