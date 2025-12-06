@@ -1,0 +1,380 @@
+/* Pokémon-styled theme for R Markdown site */
+
+/* Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Montserrat:wght@400;600;800&display=swap');
+
+/* Custom font (place file in assets/PocketMonk-15ze.ttf) */
+@font-face {
+  font-family: "PocketMonk";
+  src: url("PocketMonk-15ze.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --pk-yellow: #FFCB05;
+  --pk-blue:   #3D7DCA;
+  --pk-red:    #FF1C1C;
+  --pk-black:  #111111;
+  --pk-gray:   #f1f3f7;
+  --pk-white:  #ffffff;
+}
+
+html, body {
+  background: var(--pk-gray);
+  color: var(--pk-black);
+  font-family: "Montserrat", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", sans-serif;
+  line-height: 1.6;
+}
+
+/* Headings use PocketMonk, fallback to Press Start 2P */
+h1, h2, h3 {
+  font-family: "PocketMonk", "Press Start 2P", cursive;
+  color: var(--pk-yellow);
+  letter-spacing: 0.5px;
+  text-shadow:
+    2px 2px 0 #000,
+    -2px 2px 0 #000,
+    2px -2px 0 #000,
+    -2px -2px 0 #000;
+  margin-top: 1.2em;
+}
+
+h4, h5, h6 {
+  font-weight: 800;
+  color: var(--pk-blue);
+}
+
+/* Navbar */
+.navbar {
+  background: linear-gradient(90deg, var(--pk-blue) 0%, #2a6db0 50%, var(--pk-yellow) 100%) !important;
+  border-bottom: 4px solid #000;
+}
+.navbar .navbar-brand,
+.navbar .navbar-nav > li > a {
+  color: #fff !important;
+}
+.navbar .navbar-brand {
+  font-family: "PocketMonk", "Press Start 2P", cursive;
+  color: var(--pk-yellow) !important;
+  text-shadow: 2px 2px 0 #000;
+  letter-spacing: 0.5px;
+}
+.navbar .navbar-nav > li > a:hover {
+  color: var(--pk-black) !important;
+  text-shadow: 1px 1px 0 rgba(255,255,255,0.4);
+}
+
+/* Links and buttons */
+a { color: var(--pk-blue); }
+a:hover, a:focus { color: var(--pk-red); text-decoration: none; }
+
+.btn-primary {
+  background-color: var(--pk-red);
+  border-color: #b40f0f;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+.btn-primary:hover { background-color: #d71414; border-color: #a10c0c; }
+
+/* Panels, cards, and general containers */
+.panel, .well, .card, .rmdnote, .rmdwarning {
+  border: 3px solid #000;
+  border-radius: 12px;
+  box-shadow: 6px 6px 0 #00000020;
+}
+
+/* TOC styling */
+.tocify, .tocify-wrapper {
+  background: var(--pk-white);
+  border: 3px solid #000;
+  border-radius: 12px;
+}
+.tocify .tocify-item > a {
+  font-weight: 600;
+}
+
+/* Code blocks (source) */
+pre, code, kbd, samp {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+}
+pre {
+  background: #0b1020;
+  color: #f3f7ff;
+  border-radius: 8px;
+  border: 2px solid #000;
+}
+
+/* Strong contrast for source/output blocks */
+div.sourceCode, pre.sourceCode {
+  background: #0b1020 !important;
+  color: #f3f7ff !important;
+  border: 2px solid #000;
+  border-radius: 8px;
+}
+div.sourceCode code, pre.sourceCode code { color: #f3f7ff !important; }
+pre.output, pre.console, pre.r-output, .knitr .output {
+  background: #1a2233 !important;
+  color: #f3f7ff !important;
+  border: 2px solid #000;
+  border-radius: 8px;
+  padding: 12px;
+}
+code span.kw, code span.dt, code span.dv, code span.bn, code span.fl,
+code span.ch, code span.st, code span.co, code span.ot, code span.al,
+code span.fu, code span.er {
+  color: #e8ecff !important;
+}
+
+/* Horizontal trainer cards */
+.trainer-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+  align-items: start;
+}
+.trainer-card {
+  background: var(--pk-white);
+  border: 3px solid #000;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 6px 6px 0 #00000020;
+}
+.trainer-card--horiz {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+  padding: 20px;
+  text-align: left;
+}
+.trainer-card--horiz img {
+  width: 220px;
+  height: 220px;
+  border: 3px solid #000;
+  border-radius: 10px;
+  object-fit: cover;
+  flex: 0 0 220px;
+}
+.trainer-card__body { flex: 1 1 auto; }
+.trainer-card__name {
+  margin: 0 0 8px 0;
+  font-size: 1.35rem;
+  line-height: 1.2;
+  color: var(--pk-blue);
+  text-shadow: none;
+  font-family: "PocketMonk", "Press Start 2P", cursive;
+}
+
+/* Stack on smaller screens */
+@media (max-width: 720px) {
+  .trainer-card--horiz { flex-direction: column; text-align: center; align-items: center; }
+  .trainer-card--horiz img { width: 200px; height: 200px; flex: 0 0 auto; }
+  .trainer-card__body { width: 100%; }
+}
+
+/* Horizontal rule */
+hr {
+  border: 0;
+  border-top: 4px solid var(--pk-blue);
+  margin: 2rem 0;
+}
+
+/* Plotly canvas background nudge */
+.js-plotly-plot, .plotly, .plot-container {
+  background: var(--pk-white) !important;
+}
+
+/* Controls bar: stable, medium sizing */
+.controls-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px;
+  margin: 6px 0 10px;
+}
+
+/* Each control sits in a flex item with a sensible base width */
+.controls-bar .ctrl {
+  flex: 0 1 260px;   /* grows a bit, wraps if needed */
+  min-width: 200px;  /* never shrinks too tiny */
+}
+
+/* Make the actual select fill the ctrl width */
+.controls-bar .ctrl .selectize-control,
+.controls-bar .ctrl select.form-control {
+  width: 100% !important;
+  min-width: 0; /* allow shrinking inside flex */
+}
+
+/* Tidy labels */
+.controls-bar .form-group { margin-bottom: 6px; }
+.controls-bar label.control-label {
+  font-weight: 600;
+  margin-bottom: 4px;
+  font-size: 13px;
+}
+
+/* ===== Home page styling ===== */
+
+/* Color tokens */
+:root {
+  --ink: #0f0f10;
+  --ink-2: #222;
+  --bg: #ffffff;
+  --bg-soft: #f7f8fb;
+  --accent: #d32f2f;     /* Poké red */
+  --accent-2: #1976d2;   /* Cerulean */
+  --card: #ffffff;
+  --border: #0f0f10;
+  --shadow: 6px 6px 0 #00000012;
+}
+
+/* Hero */
+.home-hero {
+  position: relative;
+  overflow: clip;
+  border: 2px solid var(--border);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  margin: 12px 0 18px;
+}
+.home-hero__bg {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(1200px 400px at 10% 0%, #fff 0 30%, #fef3f3 30% 48%, #fff 48%),
+    radial-gradient(1200px 400px at 90% 10%, #fff 0 30%, #eef5ff 30% 48%, #fff 48%),
+    linear-gradient(135deg, #fff 0%, #fbfbfe 100%);
+}
+.home-hero__content {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  gap: 12px;
+  padding: clamp(22px, 4vw, 36px) clamp(16px, 3vw, 28px);
+  text-align: center;
+  color: var(--ink);
+}
+.home-hero__pokeball {
+  width: clamp(72px, 10vw, 108px);
+  height: clamp(72px, 10vw, 108px);
+  border-radius: 50%;
+  box-shadow: inset 0 -3px 0 #00000022, 0 3px 0 #00000012;
+  background:
+    radial-gradient(circle at 50% 50%, #fff 0 49%, #000 49% 52%, var(--accent) 52% 100%);
+  animation: pbFloat 6s ease-in-out infinite;
+}
+@keyframes pbFloat {
+  0%,100% { transform: translateY(0) rotate(0deg); }
+  50%     { transform: translateY(-4px) rotate(2deg); }
+}
+.home-hero__title {
+  font-family: "PocketMonk", "Montserrat", system-ui, -apple-system, sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.5px;
+  font-size: clamp(28px, 5vw, 48px);
+  margin: 0;
+}
+.home-hero__subtitle {
+  font-size: clamp(14px, 2.4vw, 18px);
+  color: #333;
+  margin: 0 0 6px;
+}
+
+/* CTA buttons */
+.home-hero__ctas {
+  display: flex; gap: 10px; flex-wrap: wrap; justify-content: center;
+}
+.btn-cta {
+  display: inline-block;
+  padding: 10px 16px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  font-weight: 800;
+  color: var(--ink);
+  background: var(--card);
+  box-shadow: 4px 4px 0 #00000012;
+  text-decoration: none;
+  transition: transform .06s ease, box-shadow .06s ease, background .12s ease;
+}
+.btn-cta:hover, .btn-cta:focus {
+  transform: translate(-1px, -1px);
+  box-shadow: 6px 6px 0 #00000018;
+}
+.btn-cta--primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--border);
+}
+.btn-cta--ghost {
+  background: #fff;
+}
+
+/* Tile grid */
+.home-grid {
+  margin: 6px 0 4px;
+}
+.home-grid__title {
+  font-weight: 900;
+  font-size: clamp(18px, 3.2vw, 22px);
+  margin: 0 0 8px;
+}
+.home-grid__tiles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 12px;
+}
+.home-tile {
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  padding: 16px 12px;
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  color: var(--ink);
+  text-decoration: none;
+  box-shadow: var(--shadow);
+  transition: transform .06s ease, box-shadow .06s ease, border-color .12s ease;
+}
+.home-tile:hover, .home-tile:focus {
+  transform: translate(-1px, -1px);
+  box-shadow: 8px 8px 0 #00000018;
+  border-color: var(--accent-2);
+}
+.home-tile__icon {
+  font-size: 28px;
+  line-height: 1;
+}
+.home-tile__label {
+  font-weight: 800;
+}
+
+/* Features */
+.home-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin: 12px 0 0;
+}
+.home-feature {
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--bg-soft);
+  padding: 12px 14px;
+  box-shadow: 4px 4px 0 #00000010;
+}
+.home-feature__icon {
+  font-size: 22px; line-height: 1; margin-bottom: 6px;
+}
+.home-feature h3 {
+  font-weight: 900; margin: 0 0 6px; font-size: 18px;
+}
+.home-feature p { margin: 0; color: #333; }
+
+/* Responsive tweaks */
+@media (max-width: 768px) {
+  .home-hero__ctas { gap: 8px; }
+  .home-tile { padding: 14px 10px; }
+}

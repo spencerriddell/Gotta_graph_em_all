@@ -1,0 +1,2344 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="Sergio Ozoria" />
+
+<meta name="date" content="2025-11-26" />
+
+<title>Project Working File</title>
+
+<script src="site_libs/header-attrs-2.30/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/cosmo.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/jqueryui-1.13.2/jquery-ui.min.js"></script>
+<link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
+<script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+<link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
+<script src="site_libs/pagedtable-1.1/js/pagedtable.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+<link rel="stylesheet" href="assets/style.css" type="text/css" />
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+details > summary > p:only-child {
+  display: inline;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark the anchor link active (and if it's in a dropdown, also mark that active)
+  var dropdown = menuAnchor.closest('li.dropdown');
+  if (window.bootstrap) { // Bootstrap 4+
+    menuAnchor.addClass('active');
+    dropdown.find('> .dropdown-toggle').addClass('active');
+  } else { // Bootstrap 3
+    menuAnchor.parent().addClass('active');
+    dropdown.addClass('active');
+  }
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before, .tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "\e259";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "\e258";
+  font-family: 'Glyphicons Halflings';
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+<style type="text/css">
+
+#TOC {
+  margin: 25px 0px 20px 0px;
+}
+@media (max-width: 768px) {
+#TOC {
+  position: relative;
+  width: 100%;
+}
+}
+
+@media print {
+.toc-content {
+  /* see https://github.com/w3c/csswg-drafts/issues/4434 */
+  float: right;
+}
+}
+
+.toc-content {
+  padding-left: 30px;
+  padding-right: 40px;
+}
+
+div.main-container {
+  max-width: 1200px;
+}
+
+div.tocify {
+  width: 20%;
+  max-width: 260px;
+  max-height: 85%;
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+  div.tocify {
+    width: 25%;
+  }
+}
+
+@media (max-width: 767px) {
+  div.tocify {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+.tocify ul, .tocify li {
+  line-height: 20px;
+}
+
+.tocify-subheader .tocify-item {
+  font-size: 0.90em;
+}
+
+.tocify .list-group-item {
+  border-radius: 0px;
+}
+
+
+</style>
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+<!-- setup 3col/9col grid for toc_float and main content  -->
+<div class="row">
+<div class="col-xs-12 col-sm-4 col-md-3">
+<div id="TOC" class="tocify">
+</div>
+</div>
+
+<div class="toc-content col-xs-12 col-sm-8 col-md-9">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-bs-toggle="collapse" data-target="#navbar" data-bs-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html"></a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="about.html">About our Trainers</a>
+</li>
+<li>
+  <a href="eda.html">Exploratory Data Analysis</a>
+</li>
+<li>
+  <a href="analysis.html">Statistical &amp; ML Analysis</a>
+</li>
+<li>
+  <a href="final_report.html">Final Report</a>
+</li>
+<li>
+  <a href="contact.html">Contact Us</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+<h1 class="title toc-ignore">Project Working File</h1>
+<h4 class="author">Sergio Ozoria</h4>
+<h4 class="date">2025-11-26</h4>
+
+</div>
+
+
+<pre class="r"><code>library(tidyverse)
+library(scales)
+library(viridis)
+library(randomForest)
+library(caret)
+
+knitr::opts_chunk$set(
+  fig.width = 6,
+  fig.asp = .6,
+  out.width = &quot;90%&quot;
+)
+
+theme_set(theme_minimal() + theme(legend.position = &quot;bottom&quot;))
+
+options(
+  ggplot2.continuous.colour = &quot;viridis&quot;,
+  ggplot2.continuous.fill = &quot;viridis&quot;
+)
+
+scale_colour_discrete = scale_colour_viridis</code></pre>
+<pre class="r"><code>#  serg - cleaning up name using snake format + concatenating missing values 
+poke_tidy = read_csv(&quot;./Data/pokemon.csv&quot;, na = c(&quot;NA&quot;, &quot;.&quot;, &quot;&quot;)) |&gt; 
+  janitor::clean_names()
+
+# serg - replacing missing type 2 with none
+poke_tidy = poke_tidy |&gt; 
+  mutate(
+    type2 = ifelse(is.na(type2), &quot;None&quot;, type2),
+    type1 = str_to_title(type1),
+    type2 = str_to_title(type2)
+  ) |&gt; 
+  distinct(name, .keep_all = TRUE)
+
+# serg - cleaning up abilities (could also create variables for each)
+poke_tidy = poke_tidy |&gt; 
+  mutate(
+    abilities = str_remove_all(abilities, &quot;\\[|\\]|&#39;&quot;)
+  )
+
+# serg - in case there&#39;s missing gender 
+poke_tidy = poke_tidy |&gt; 
+  mutate(
+    genderless = ifelse(is.na(percentage_male), TRUE, FALSE)
+  )
+
+# serg - categorical var for plotting/modeling
+poke_tidy = poke_tidy |&gt; 
+  mutate(
+    type1 = factor(type1),
+    type2 = factor(type2),
+    generation = factor(generation),
+    is_legendary = as.logical(is_legendary)
+  )</code></pre>
+<pre class="r"><code># eman - convert  numeric columns
+
+poke_tidy =
+  poke_tidy |&gt; 
+  mutate(across(
+    .cols = c(starts_with(&quot;against_&quot;), &quot;hp&quot;, &quot;attack&quot;, &quot;defense&quot;, &quot;sp_attack&quot;, &quot;sp_defense&quot;, &quot;speed&quot;, &quot;height_m&quot;, &quot;weight_kg&quot;, &quot;base_total&quot;),
+    .fns = as.numeric
+  )) </code></pre>
+<pre class="r"><code># eman - create attack/defense ratio (useful for visuals later)
+
+poke_tidy = 
+  poke_tidy |&gt; 
+  mutate(offense_defense_ratio = attack / defense)</code></pre>
+<pre class="r"><code># eman - starting with basic eda
+
+head(poke_tidy)</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["abilities"],"name":[1],"type":["chr"],"align":["left"]},{"label":["against_bug"],"name":[2],"type":["dbl"],"align":["right"]},{"label":["against_dark"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["against_dragon"],"name":[4],"type":["dbl"],"align":["right"]},{"label":["against_electric"],"name":[5],"type":["dbl"],"align":["right"]},{"label":["against_fairy"],"name":[6],"type":["dbl"],"align":["right"]},{"label":["against_fight"],"name":[7],"type":["dbl"],"align":["right"]},{"label":["against_fire"],"name":[8],"type":["dbl"],"align":["right"]},{"label":["against_flying"],"name":[9],"type":["dbl"],"align":["right"]},{"label":["against_ghost"],"name":[10],"type":["dbl"],"align":["right"]},{"label":["against_grass"],"name":[11],"type":["dbl"],"align":["right"]},{"label":["against_ground"],"name":[12],"type":["dbl"],"align":["right"]},{"label":["against_ice"],"name":[13],"type":["dbl"],"align":["right"]},{"label":["against_normal"],"name":[14],"type":["dbl"],"align":["right"]},{"label":["against_poison"],"name":[15],"type":["dbl"],"align":["right"]},{"label":["against_psychic"],"name":[16],"type":["dbl"],"align":["right"]},{"label":["against_rock"],"name":[17],"type":["dbl"],"align":["right"]},{"label":["against_steel"],"name":[18],"type":["dbl"],"align":["right"]},{"label":["against_water"],"name":[19],"type":["dbl"],"align":["right"]},{"label":["attack"],"name":[20],"type":["dbl"],"align":["right"]},{"label":["base_egg_steps"],"name":[21],"type":["dbl"],"align":["right"]},{"label":["base_happiness"],"name":[22],"type":["dbl"],"align":["right"]},{"label":["base_total"],"name":[23],"type":["dbl"],"align":["right"]},{"label":["capture_rate"],"name":[24],"type":["chr"],"align":["left"]},{"label":["classfication"],"name":[25],"type":["chr"],"align":["left"]},{"label":["defense"],"name":[26],"type":["dbl"],"align":["right"]},{"label":["experience_growth"],"name":[27],"type":["dbl"],"align":["right"]},{"label":["height_m"],"name":[28],"type":["dbl"],"align":["right"]},{"label":["hp"],"name":[29],"type":["dbl"],"align":["right"]},{"label":["japanese_name"],"name":[30],"type":["chr"],"align":["left"]},{"label":["name"],"name":[31],"type":["chr"],"align":["left"]},{"label":["percentage_male"],"name":[32],"type":["dbl"],"align":["right"]},{"label":["pokedex_number"],"name":[33],"type":["dbl"],"align":["right"]},{"label":["sp_attack"],"name":[34],"type":["dbl"],"align":["right"]},{"label":["sp_defense"],"name":[35],"type":["dbl"],"align":["right"]},{"label":["speed"],"name":[36],"type":["dbl"],"align":["right"]},{"label":["type1"],"name":[37],"type":["fct"],"align":["left"]},{"label":["type2"],"name":[38],"type":["fct"],"align":["left"]},{"label":["weight_kg"],"name":[39],"type":["dbl"],"align":["right"]},{"label":["generation"],"name":[40],"type":["fct"],"align":["left"]},{"label":["is_legendary"],"name":[41],"type":["lgl"],"align":["right"]},{"label":["genderless"],"name":[42],"type":["lgl"],"align":["right"]},{"label":["offense_defense_ratio"],"name":[43],"type":["dbl"],"align":["right"]}],"data":[{"1":"Overgrow, Chlorophyll","2":"1.00","3":"1","4":"1","5":"0.5","6":"0.5","7":"0.5","8":"2.0","9":"2","10":"1","11":"0.25","12":"1","13":"2.0","14":"1","15":"1","16":"2","17":"1","18":"1.0","19":"0.5","20":"49","21":"5120","22":"70","23":"318","24":"45","25":"Seed Pokémon","26":"49","27":"1059860","28":"0.7","29":"45","30":"Fushigidaneフシギダネ","31":"Bulbasaur","32":"88.1","33":"1","34":"65","35":"65","36":"45","37":"Grass","38":"Poison","39":"6.9","40":"1","41":"FALSE","42":"FALSE","43":"1.0000000"},{"1":"Overgrow, Chlorophyll","2":"1.00","3":"1","4":"1","5":"0.5","6":"0.5","7":"0.5","8":"2.0","9":"2","10":"1","11":"0.25","12":"1","13":"2.0","14":"1","15":"1","16":"2","17":"1","18":"1.0","19":"0.5","20":"62","21":"5120","22":"70","23":"405","24":"45","25":"Seed Pokémon","26":"63","27":"1059860","28":"1.0","29":"60","30":"Fushigisouフシギソウ","31":"Ivysaur","32":"88.1","33":"2","34":"80","35":"80","36":"60","37":"Grass","38":"Poison","39":"13.0","40":"1","41":"FALSE","42":"FALSE","43":"0.9841270"},{"1":"Overgrow, Chlorophyll","2":"1.00","3":"1","4":"1","5":"0.5","6":"0.5","7":"0.5","8":"2.0","9":"2","10":"1","11":"0.25","12":"1","13":"2.0","14":"1","15":"1","16":"2","17":"1","18":"1.0","19":"0.5","20":"100","21":"5120","22":"70","23":"625","24":"45","25":"Seed Pokémon","26":"123","27":"1059860","28":"2.0","29":"80","30":"Fushigibanaフシギバナ","31":"Venusaur","32":"88.1","33":"3","34":"122","35":"120","36":"80","37":"Grass","38":"Poison","39":"100.0","40":"1","41":"FALSE","42":"FALSE","43":"0.8130081"},{"1":"Blaze, Solar Power","2":"0.50","3":"1","4":"1","5":"1.0","6":"0.5","7":"1.0","8":"0.5","9":"1","10":"1","11":"0.50","12":"2","13":"0.5","14":"1","15":"1","16":"1","17":"2","18":"0.5","19":"2.0","20":"52","21":"5120","22":"70","23":"309","24":"45","25":"Lizard Pokémon","26":"43","27":"1059860","28":"0.6","29":"39","30":"Hitokageヒトカゲ","31":"Charmander","32":"88.1","33":"4","34":"60","35":"50","36":"65","37":"Fire","38":"None","39":"8.5","40":"1","41":"FALSE","42":"FALSE","43":"1.2093023"},{"1":"Blaze, Solar Power","2":"0.50","3":"1","4":"1","5":"1.0","6":"0.5","7":"1.0","8":"0.5","9":"1","10":"1","11":"0.50","12":"2","13":"0.5","14":"1","15":"1","16":"1","17":"2","18":"0.5","19":"2.0","20":"64","21":"5120","22":"70","23":"405","24":"45","25":"Flame Pokémon","26":"58","27":"1059860","28":"1.1","29":"58","30":"Lizardoリザード","31":"Charmeleon","32":"88.1","33":"5","34":"80","35":"65","36":"80","37":"Fire","38":"None","39":"19.0","40":"1","41":"FALSE","42":"FALSE","43":"1.1034483"},{"1":"Blaze, Solar Power","2":"0.25","3":"1","4":"1","5":"2.0","6":"0.5","7":"0.5","8":"0.5","9":"1","10":"1","11":"0.25","12":"0","13":"1.0","14":"1","15":"1","16":"1","17":"4","18":"0.5","19":"2.0","20":"104","21":"5120","22":"70","23":"634","24":"45","25":"Flame Pokémon","26":"78","27":"1059860","28":"1.7","29":"78","30":"Lizardonリザードン","31":"Charizard","32":"88.1","33":"6","34":"159","35":"115","36":"100","37":"Fire","38":"Flying","39":"90.5","40":"1","41":"FALSE","42":"FALSE","43":"1.3333333"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<pre class="r"><code>ggplot(poke_tidy, aes(base_total))+
+  geom_histogram(bins = 30, fill = &quot;skyblue&quot;, color = &quot;black&quot;)+
+  labs(title = &quot;Distribution of Total Stats&quot;)</code></pre>
+<p><img src="workingdoc_files/figure-html/unnamed-chunk-3-1.png" width="90%" /></p>
+<div id="ditstribution-of-total-stats" class="section level2">
+<h2>Ditstribution of Total Stats</h2>
+<p>We first looked at the overall strength of all Pokemon by plotting
+the <code>base_total</code>. This helps us understand how strong mose
+pokemon are. The histogram shows that mnay pokemon fall in the middle
+range (from 300-550 total stats). Only a few Pokemon have very high
+stats (above 650), which makes sense because very strong Pokemon are
+rare. From this plot, we can see that the dataset includes both weak and
+strong Pokremon, and it’s a good starting point before we compare groups
+or run hypothesis tests.</p>
+<pre class="r"><code># eman - average total stats by type
+
+ggplot(poke_tidy, aes(type1, base_total))+
+  geom_boxplot()+
+  coord_flip()+
+  labs(title = &quot;Total Stats by Primary Type&quot;)</code></pre>
+<p><img src="workingdoc_files/figure-html/unnamed-chunk-4-1.png" width="90%" /></p>
+</div>
+<div id="total-stats-by-primary-type" class="section level2">
+<h2>Total Stats by Primary Type</h2>
+<p>We compared total stats across different Pokemon types to see if some
+types are usually stronger than others. The boxplot shows clear
+differences. Types like Dragon, Steel, and Psychic tend to have higher
+total stats. On the other hand, Bug, Normal, and Poison types usually
+have lower stats. Even though the ranges overlap, the medians are
+different enough to show that type does matter.This supports our later
+statistical test (ANOVA), which also found significant differences
+across types.</p>
+<pre class="r"><code>#eman - height vs weight colored by strength
+
+ggplot(poke_tidy, aes(height_m, weight_kg, color = base_total))+
+  geom_point(alpha = 0.6, size =2)+
+  scale_color_viridis_c()+
+  labs(title = &quot;Height vs Weight (Colored by total stats&quot;)</code></pre>
+<pre><code>## Warning: Removed 20 rows containing missing values or values outside the
+## scale range (`geom_point()`).</code></pre>
+<p><img src="workingdoc_files/figure-html/unnamed-chunk-5-1.png" width="90%" /></p>
+</div>
+<div id="height-vs.-weight-colored-by-total-stats"
+class="section level2">
+<h2>Height vs. Weight Colored by Total Stats</h2>
+<p>To see how physical characteristics relate to strength, we plotted
+each Pokemon’s height and weight and colored the points by total stats.
+The plots shows that many of the heavier and taller Pokemon have higher
+stats (shown by the brighter colors). Smaller Pokemon have a wide range
+of stat values, meaning some are strong but many are not. This suggests
+that size does play a role in strength, although it is not the only
+factor. This is why we later include height and weight as covariates in
+the regression model.</p>
+<pre class="r"><code># eman - hypothesis testing
+# test 1: ANOVA - Do types differ in strength?
+# Null hypothesis: mean total stats are equal across all types
+
+anova_type = 
+  aov(base_total ~ type1, data = poke_tidy)
+summary(anova_type)</code></pre>
+<pre><code>##              Df   Sum Sq Mean Sq F value   Pr(&gt;F)    
+## type1        17   749022   44060   3.249 1.04e-05 ***
+## Residuals   783 10618573   13561                     
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code># eman - hypothesis testing
+# test 2: t-test - Are legendary Pokemon stronger?
+# Null hypothesis:legendary and non-legendary pokemon have the same mean total stats
+
+t.test(base_total ~ is_legendary, data = poke_tidy)</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  base_total by is_legendary
+## t = -19.268, df = 92.287, p-value &lt; 2.2e-16
+## alternative hypothesis: true difference in means between group FALSE and group TRUE is not equal to 0
+## 95 percent confidence interval:
+##  -225.8825 -183.6688
+## sample estimates:
+## mean in group FALSE  mean in group TRUE 
+##            410.4815            615.2571</code></pre>
+</div>
+<div id="compating-strength-across-types-and-legendary-status"
+class="section level2">
+<h2>Compating Strength Across Types and Legendary Status</h2>
+<p>We then ran two hypothesis tests to compare Pokemon strength across
+groups. First, the ANOVA showed that average total stats are different
+across Pokemon types (p&lt;0.001). This matches what we saw in the
+boxplot, where some types clearly looked stronger than others. Second,
+the t-test comparing legedary vs. non-legendary Pokemon showed that
+legendary Pokemon have much higher total stats. The difference was very
+significant. These results tell us that both Pokemon type and legendary
+status are strongly related to how strong a Pokemon is.</p>
+<pre class="r"><code># eman - logistic regression (predicting legendary)
+
+legend_model =
+  glm (
+    is_legendary ~ base_total + type1+ generation,
+    data = poke_tidy, 
+    family = &quot;binomial&quot;
+  )</code></pre>
+<pre><code>## Warning: glm.fit: fitted probabilities numerically 0 or 1 occurred</code></pre>
+<pre class="r"><code>summary(legend_model)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = is_legendary ~ base_total + type1 + generation, 
+##     family = &quot;binomial&quot;, data = poke_tidy)
+## 
+## Coefficients:
+##                 Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)   -2.239e+01  2.767e+00  -8.093 5.80e-16 ***
+## base_total     3.386e-02  4.245e-03   7.976 1.51e-15 ***
+## type1Dark      2.736e-01  1.168e+00   0.234  0.81480    
+## type1Dragon   -1.397e+00  1.141e+00  -1.224  0.22090    
+## type1Electric  1.536e+00  1.029e+00   1.492  0.13558    
+## type1Fairy    -2.487e-01  1.858e+00  -0.134  0.89348    
+## type1Fighting -1.605e+01  1.541e+03  -0.010  0.99169    
+## type1Fire      8.577e-01  9.762e-01   0.879  0.37959    
+## type1Flying    2.076e+00  1.974e+00   1.052  0.29287    
+## type1Ghost    -9.687e-01  1.696e+00  -0.571  0.56777    
+## type1Grass     1.447e-01  9.941e-01   0.146  0.88430    
+## type1Ground    1.941e-01  1.421e+00   0.137  0.89134    
+## type1Ice       1.620e+00  1.154e+00   1.404  0.16046    
+## type1Normal   -1.120e+00  1.130e+00  -0.991  0.32173    
+## type1Poison   -1.449e+01  1.542e+03  -0.009  0.99250    
+## type1Psychic   2.636e+00  9.705e-01   2.716  0.00661 ** 
+## type1Rock      2.770e-01  1.100e+00   0.252  0.80121    
+## type1Steel     1.142e+00  1.110e+00   1.029  0.30325    
+## type1Water    -1.926e-01  9.945e-01  -0.194  0.84642    
+## generation2    4.391e-01  9.427e-01   0.466  0.64134    
+## generation3   -1.655e-03  8.533e-01  -0.002  0.99845    
+## generation4    1.357e+00  7.983e-01   1.700  0.08918 .  
+## generation5    2.057e+00  7.919e-01   2.598  0.00938 ** 
+## generation6    8.270e-01  1.026e+00   0.806  0.42014    
+## generation7    3.563e+00  8.468e-01   4.208 2.58e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 474.93  on 800  degrees of freedom
+## Residual deviance: 177.25  on 776  degrees of freedom
+## AIC: 227.25
+## 
+## Number of Fisher Scoring iterations: 18</code></pre>
+<pre class="r"><code>poke_tidy$predicted_legendary =
+  predict(legend_model, type = &quot;response&quot;)</code></pre>
+</div>
+<div id="capture-rate-vs-performance-analysis-non-legendary"
+class="section level2">
+<h2>Capture Rate vs Performance Analysis (non-legendary)</h2>
+<pre class="r"><code># Build analysis sample and covariates
+capture_stats &lt;- poke |&gt;
+  filter(!is_legendary) |&gt;
+  mutate(
+    capture_rate    = suppressWarnings(as.numeric(capture_rate)),
+    percentage_male = suppressWarnings(as.numeric(percentage_male)),
+    generation_grp  = case_when(
+      generation %in% c(&quot;1&quot;,&quot;2&quot;,&quot;3&quot;) ~ &quot;Early&quot;,
+      generation %in% c(&quot;4&quot;,&quot;5&quot;,&quot;6&quot;,&quot;7&quot;) ~ &quot;Modern&quot;,
+      TRUE ~ NA_character_
+    )
+  ) |&gt;
+  mutate(generation_grp = factor(generation_grp, levels = c(&quot;Early&quot;, &quot;Modern&quot;))) |&gt;
+  filter(if_all(c(capture_rate, base_total, height_m, weight_kg, percentage_male, generation_grp), ~ !is.na(.x)))</code></pre>
+<pre class="r"><code># Linear regression: total stats ~ capture rate + size + sex + generation group
+lm_fit &lt;- lm(
+  base_total ~ capture_rate + height_m + weight_kg + percentage_male + generation_grp,
+  data = capture_stats
+)
+
+lm_tidy &lt;- broom::tidy(lm_fit, conf.int = TRUE) |&gt;
+  mutate(
+    term = recode(term,
+      &quot;(Intercept)&quot;          = &quot;Intercept&quot;,
+      &quot;capture_rate&quot;         = &quot;Capture Rate (higher = easier)&quot;,
+      &quot;height_m&quot;             = &quot;Height (m)&quot;,
+      &quot;weight_kg&quot;            = &quot;Weight (kg)&quot;,
+      &quot;percentage_male&quot;      = &quot;Percentage Male&quot;,
+      &quot;generation_grpModern&quot; = &quot;Generation: Modern (vs Early)&quot;
+    )
+  ) |&gt;
+  transmute(
+    Predictor = term,
+    Estimate  = round(estimate, 2),
+    `95% CI Low`  = round(conf.low, 2),
+    `95% CI High` = round(conf.high, 2),
+    `p-value`     = scales::pvalue(p.value)
+  )
+
+gt_compact(lm_tidy,
+  title = &quot;Regression: Capture Rate Predicting Total Base Stats (non-legendary)&quot;,
+  subtitle = &quot;Model adjusts for Height, Weight, Percentage Male, and Generation group&quot;
+)</code></pre>
+<div id="vosmmtyzty" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#vosmmtyzty table {
+  font-family: Montserrat, system-ui, -apple-system, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#vosmmtyzty thead, #vosmmtyzty tbody, #vosmmtyzty tfoot, #vosmmtyzty tr, #vosmmtyzty td, #vosmmtyzty th {
+  border-style: none;
+}
+
+#vosmmtyzty p {
+  margin: 0;
+  padding: 0;
+}
+
+#vosmmtyzty .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: 760px;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#vosmmtyzty .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#vosmmtyzty .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#vosmmtyzty .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#vosmmtyzty .gt_heading {
+  background-color: #FFFFFF;
+  text-align: left;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#vosmmtyzty .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#vosmmtyzty .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#vosmmtyzty .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#vosmmtyzty .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#vosmmtyzty .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#vosmmtyzty .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#vosmmtyzty .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#vosmmtyzty .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#vosmmtyzty .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#vosmmtyzty .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#vosmmtyzty .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#vosmmtyzty .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#vosmmtyzty .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#vosmmtyzty .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#vosmmtyzty .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#vosmmtyzty .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#vosmmtyzty .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#vosmmtyzty .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#vosmmtyzty .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#vosmmtyzty .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#vosmmtyzty .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#vosmmtyzty .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#vosmmtyzty .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#vosmmtyzty .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#vosmmtyzty .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#vosmmtyzty .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#vosmmtyzty .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#vosmmtyzty .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#vosmmtyzty .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#vosmmtyzty .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#vosmmtyzty .gt_left {
+  text-align: left;
+}
+
+#vosmmtyzty .gt_center {
+  text-align: center;
+}
+
+#vosmmtyzty .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#vosmmtyzty .gt_font_normal {
+  font-weight: normal;
+}
+
+#vosmmtyzty .gt_font_bold {
+  font-weight: bold;
+}
+
+#vosmmtyzty .gt_font_italic {
+  font-style: italic;
+}
+
+#vosmmtyzty .gt_super {
+  font-size: 65%;
+}
+
+#vosmmtyzty .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#vosmmtyzty .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#vosmmtyzty .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#vosmmtyzty .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#vosmmtyzty .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#vosmmtyzty .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#vosmmtyzty .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#vosmmtyzty .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#vosmmtyzty div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    <tr class="gt_heading">
+      <td colspan="5" class="gt_heading gt_title gt_font_normal" style><span class='gt_from_md'>Regression: Capture Rate Predicting Total Base Stats (non-legendary)</span></td>
+    </tr>
+    <tr class="gt_heading">
+      <td colspan="5" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style><span class='gt_from_md'>Model adjusts for Height, Weight, Percentage Male, and Generation group</span></td>
+    </tr>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="Predictor">Predictor</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="Estimate">Estimate</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="a95%-CI-Low">95% CI Low</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="a95%-CI-High">95% CI High</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="p-value">p-value</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="Predictor" class="gt_row gt_left">Intercept</td>
+<td headers="Estimate" class="gt_row gt_left">482.91</td>
+<td headers="95% CI Low" class="gt_row gt_left">459.36</td>
+<td headers="95% CI High" class="gt_row gt_left">506.45</td>
+<td headers="p-value" class="gt_row gt_left">&lt;0.001</td></tr>
+    <tr><td headers="Predictor" class="gt_row gt_left gt_striped">Capture Rate (higher = easier)</td>
+<td headers="Estimate" class="gt_row gt_left gt_striped">-0.85</td>
+<td headers="95% CI Low" class="gt_row gt_left gt_striped">-0.94</td>
+<td headers="95% CI High" class="gt_row gt_left gt_striped">-0.77</td>
+<td headers="p-value" class="gt_row gt_left gt_striped">&lt;0.001</td></tr>
+    <tr><td headers="Predictor" class="gt_row gt_left">Height (m)</td>
+<td headers="Estimate" class="gt_row gt_left">20.55</td>
+<td headers="95% CI Low" class="gt_row gt_left">13.06</td>
+<td headers="95% CI High" class="gt_row gt_left">28.05</td>
+<td headers="p-value" class="gt_row gt_left">&lt;0.001</td></tr>
+    <tr><td headers="Predictor" class="gt_row gt_left gt_striped">Weight (kg)</td>
+<td headers="Estimate" class="gt_row gt_left gt_striped">0.25</td>
+<td headers="95% CI Low" class="gt_row gt_left gt_striped">0.15</td>
+<td headers="95% CI High" class="gt_row gt_left gt_striped">0.34</td>
+<td headers="p-value" class="gt_row gt_left gt_striped">&lt;0.001</td></tr>
+    <tr><td headers="Predictor" class="gt_row gt_left">Percentage Male</td>
+<td headers="Estimate" class="gt_row gt_left">-0.36</td>
+<td headers="95% CI Low" class="gt_row gt_left">-0.64</td>
+<td headers="95% CI High" class="gt_row gt_left">-0.09</td>
+<td headers="p-value" class="gt_row gt_left">0.010</td></tr>
+    <tr><td headers="Predictor" class="gt_row gt_left gt_striped">Generation: Modern (vs Early)</td>
+<td headers="Estimate" class="gt_row gt_left gt_striped">9.11</td>
+<td headers="95% CI Low" class="gt_row gt_left gt_striped">-1.69</td>
+<td headers="95% CI High" class="gt_row gt_left gt_striped">19.91</td>
+<td headers="p-value" class="gt_row gt_left gt_striped">0.098</td></tr>
+  </tbody>
+  
+</table>
+</div>
+<pre class="r"><code># Visualization: relationship with fitted line (partial, not residualized)
+ggplot(capture_stats, aes(capture_rate, base_total)) +
+  geom_point(alpha = 0.45, color = &quot;#1976d2&quot;) +
+  geom_smooth(method = &quot;lm&quot;, se = TRUE, color = &quot;#c22e28&quot;) +
+  labs(
+    title = &quot;Capture Rate vs Total Base Stats (non-legendary)&quot;,
+    subtitle = &quot;Higher capture_rate means easier to catch&quot;,
+    x = &quot;Capture Rate&quot;,
+    y = &quot;Total Base Stats&quot;
+  )</code></pre>
+<pre><code>## `geom_smooth()` using formula = &#39;y ~ x&#39;</code></pre>
+<p><img src="workingdoc_files/figure-html/capture-rate-plot-1.png" width="90%" /></p>
+<div id="hypotheses" class="section level4">
+<h4>Hypotheses</h4>
+<ul>
+<li>H₀: No linear relationship between capture_rate and base_total among
+non-legendary Pokémon after adjusting for covariates.</li>
+<li>H₁: A significant negative relationship exists: harder-to-catch
+Pokémon (lower capture_rate) have higher base_total, controlling for
+covariates.</li>
+</ul>
+</div>
+<div id="measures-and-covariates" class="section level4">
+<h4>Measures and covariates</h4>
+<ul>
+<li>Exposure: capture_rate (numeric; higher = easier to catch).</li>
+<li>Outcome: base_total (sum of HP, Attack, Defense, Sp. Attack, Sp.
+Defense, Speed).</li>
+<li>Covariates: Height (m), Weight (kg), Percentage Male, Generation
+group (Early vs Modern).</li>
+</ul>
+</div>
+<div id="interpretation" class="section level4">
+<h4>Interpretation</h4>
+<p>The regression table shows a significant negative coefficient for
+Capture Rate, indicating that, among non-legendary Pokémon, species that
+are harder to catch tend to have higher total base stats, even after
+adjusting for physical size, sex distribution, and generation group. The
+plot illustrates the overall downward trend. This supports rejecting H₀
+in favor of H₁.</p>
+</div>
+</div>
+<div id="logistic-regression-predicting-legendary-pokemon"
+class="section level2">
+<h2>Logistic Regression: Predicting Legendary Pokemon</h2>
+<p>We ran a logistic regression to see whether we could predict if a
+Pokemon is legendary based on its total stats, type, and generation.
+This model helps us understand which characteristics are most strongly
+linked with legendary status. The results show that
+<code>base_total</code> is the strongest and most important predictor.
+As total stats increase, the probability of being legendary also
+increases. This makes sense, because legendary Pokemon are designed to
+be much stronger than regular Pokemon. Most of the type variables were
+not significant, meaning that a Pokemon’s type does not strongly
+determine whether it is legendary after we account for total stats. A
+few generations showed small effects, but these were not as strong as
+the effect of base_total. Overall, the model supports what we expected:
+Stronger Pokemon are far more likely to be legendary, and total stats
+explain more of this difference.</p>
+<pre class="r"><code>#eman - saving clean dataset
+
+write_csv(poke_tidy, &quot;Data/pokemon_clean.csv&quot;)</code></pre>
+<pre class="r"><code>#maria - Hypothesis testing
+
+# Can we predict Pokémon type from stats?
+
+poke_type &lt;- poke_tidy |&gt; 
+  select(type1, hp, attack, defense, sp_attack, sp_defense, speed) |&gt; 
+  mutate(type1 = as.factor(type1))
+
+# 80/20 train-test split
+set.seed(123)
+
+train_index &lt;- createDataPartition(poke_type[[&quot;type1&quot;]], 
+                                   p = 0.8, list = FALSE)
+
+train_set &lt;- poke_type[train_index, ]
+test_set  &lt;- poke_type[-train_index, ]
+
+# Train Random Forest
+type_model = randomForest(type1 ~ ., data = train_set, ntree = 500)
+
+# Make predictions
+predictions = predict(type_model, newdata = test_set)
+
+# Accuracy
+accuracy = mean(predictions == test_set[[1]])
+baseline = 1/18
+improvement = accuracy - baseline
+
+# Results
+results = list(
+  Accuracy = round(accuracy * 100, 1),
+  Baseline = round(100/18, 1),
+  Improvement = round((accuracy - (1/18)) * 100, 1)
+)
+
+results</code></pre>
+<pre><code>## $Accuracy
+## [1] 23.2
+## 
+## $Baseline
+## [1] 5.6
+## 
+## $Improvement
+## [1] 17.6</code></pre>
+<pre class="r"><code># Feature importance
+importance_scores = importance(type_model)
+varImpPlot(type_model, main = &quot;Feature Importance for Type Prediction&quot;)</code></pre>
+<p><img src="workingdoc_files/figure-html/unnamed-chunk-10-1.png" width="90%" /></p>
+<pre class="r"><code># Type-specific accuracy
+conf_matrix = table(test_set[[&quot;type1&quot;]], predictions)
+
+type_accuracy = diag(conf_matrix) / rowSums(conf_matrix)
+
+type_accuracy_df &lt;- data.frame(
+  Type = names(type_accuracy),
+  Accuracy = round(type_accuracy * 100, 1)
+) |&gt; 
+  arrange(desc(Accuracy)) |&gt; 
+  na.omit()
+
+
+# Visualization for Prediction Accuracy
+ggplot(type_accuracy_df, 
+       aes(x = reorder(Type, Accuracy), 
+           y = Accuracy)) +
+  geom_col(aes(fill = Accuracy &gt; 23.2)) +
+  geom_hline(yintercept = 23.2, linetype = &quot;dashed&quot;, color = &quot;red&quot;) + 
+  coord_flip() +
+  scale_fill_manual(
+    values = c(&quot;TRUE&quot; = &quot;steelblue&quot;, &quot;FALSE&quot; = &quot;gray&quot;),
+    labels = c(&quot;Below average&quot;, &quot;Above average&quot;),
+    name = &quot;Type performance&quot;
+  ) +
+  labs(
+    title = &quot;Random Forest: Type-Specific Prediction Accuracy&quot;,
+    subtitle = &quot;Accuracy (%) for each Pokémon primary type (test set)&quot;,
+    x = &quot;Pokémon Type&quot;,
+    y = &quot;Accuracy (%)&quot;
+  ) +
+  theme_bw()+
+theme(legend.position = &quot;bottom&quot;)</code></pre>
+<p><img src="workingdoc_files/figure-html/unnamed-chunk-10-2.png" width="90%" /></p>
+<p>The Random Forest model achieved 23.2% accuracy in predicting Pokémon
+primary type from base stats alone—4.1 times better than the 5.6%
+baseline expected from random guessing across 18 types. This represents
+a 17.6 percentage-point improvement and narrowly approaches our 25%
+stretch target, demonstrating that Pokémon stats do contain meaningful
+type-specific patterns.</p>
+<p>Types with 0% accuracy likely had very small sample sizes in the test
+set (1-2 Pokémon), making them vulnerable to misclassification. This
+highlights a limitation of our dataset size for rare type
+categories.</p>
+<p>Surprisingly, Normal type was most predictable (61.9%), possibly
+because its balanced, middle-range stat profile is distinctive compared
+to the more specialized distributions of other types.</p>
+</div>
+<div id="hypothesis-test-conclusion" class="section level2">
+<h2>HYPOTHESIS TEST CONCLUSION:</h2>
+<p>We REJECT the null hypothesis (H₀). The model’s performance exceeds
+baseline, providing evidence that Pokémon primary types differ
+systematically in their stat distributions.</p>
+<p>Variable importance analysis reveals that Special Attack, Attack and
+Speed are the strongest type predictors. This suggests offensive
+capabilities and speed tiers are more type-distinctive than defensive
+stats—consistent with Pokémon battle mechanics where types often
+specialize in offensive roles (e.g., Fighting types favor high Attack,
+Psychic types favor Special Attack).</p>
+<p>Type-specific accuracy varied substantially. The easiest types to
+predict were Normal (61.9%), Fighting (40%), and Fire (40%), likely
+because these types have distinctive stat profiles. In contrast, several
+types such as Fairy, Ghost, Ground, Ice, Poison, and Rock had 0%
+accuracy, reflecting high overlap in stat distributions with other
+types. This explains why the overall model accuracy (~23%) is moderate,
+many Pokémon share similar stats despite different types.</p>
+<p>From a gameplay perspective, base stats provide useful but incomplete
+information about type identity. Players should consider both stat
+distributions and type matchups when building balanced teams.</p>
+</div>
+<div id="capture-rate-vs-performance-analysis" class="section level2">
+<h2>Capture Rate vs Performance Analysis</h2>
+<pre class="r"><code># Serg - Hypothesis testing using linear regression
+# RQ: Is there a relationship between capture rate and overall combat effectiveness?
+
+
+capture_stats &lt;- poke_tidy |&gt;
+  mutate(
+    capture_rate    = as.numeric(capture_rate),
+    percentage_male = as.numeric(percentage_male),
+    generation_grp  = case_when(
+      generation %in% c(&quot;1&quot;,&quot;2&quot;,&quot;3&quot;) ~ &quot;Early&quot;,
+      generation %in% c(&quot;4&quot;,&quot;5&quot;,&quot;6&quot;,&quot;7&quot;) ~ &quot;Modern&quot;,
+      TRUE ~ NA_character_
+    )
+  ) |&gt;
+  mutate(
+    generation_grp = factor(generation_grp, levels = c(&quot;Early&quot;, &quot;Modern&quot;))
+  ) |&gt;
+  filter(
+    is_legendary == FALSE,
+    !is.na(capture_rate),
+    !is.na(base_total),
+    !is.na(height_m),
+    !is.na(weight_kg),
+    !is.na(percentage_male),
+    !is.na(generation_grp)
+  )
+
+# Run linear regression
+capture_stats_lm &lt;- lm(
+  base_total ~ capture_rate + height_m + 
+    weight_kg + percentage_male + generation_grp,
+  data = capture_stats
+)
+
+summary(capture_stats_lm)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = base_total ~ capture_rate + height_m + weight_kg + 
+##     percentage_male + generation_grp, data = capture_stats)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -309.936  -36.895    3.166   37.754  258.690 
+## 
+## Coefficients:
+##                       Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)          482.90684   11.99129  40.271  &lt; 2e-16 ***
+## capture_rate          -0.85462    0.04146 -20.615  &lt; 2e-16 ***
+## height_m              20.55383    3.81794   5.383 1.01e-07 ***
+## weight_kg              0.24705    0.04892   5.050 5.70e-07 ***
+## percentage_male       -0.36099    0.14029  -2.573   0.0103 *  
+## generation_grpModern   9.11267    5.50052   1.657   0.0980 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 70.58 on 671 degrees of freedom
+## Multiple R-squared:  0.5629, Adjusted R-squared:  0.5596 
+## F-statistic: 172.8 on 5 and 671 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>coef_table &lt;- summary(capture_stats_lm)$coefficients |&gt;
+  as.data.frame() |&gt;
+  tibble::rownames_to_column(&quot;Predictor&quot;)
+
+knitr::kable(
+  coef_table,
+  digits = 3,
+  caption = &quot;Regression: Capture Rate Predicting Total Base Stats&quot;
+)</code></pre>
+<table>
+<caption>Regression: Capture Rate Predicting Total Base Stats</caption>
+<colgroup>
+<col width="30%" />
+<col width="13%" />
+<col width="16%" />
+<col width="11%" />
+<col width="27%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Predictor</th>
+<th align="right">Estimate</th>
+<th align="right">Std. Error</th>
+<th align="right">t value</th>
+<th align="right">Pr(&gt;|t|)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">(Intercept)</td>
+<td align="right">482.907</td>
+<td align="right">11.991</td>
+<td align="right">40.271</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">capture_rate</td>
+<td align="right">-0.855</td>
+<td align="right">0.041</td>
+<td align="right">-20.615</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">height_m</td>
+<td align="right">20.554</td>
+<td align="right">3.818</td>
+<td align="right">5.383</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="even">
+<td align="left">weight_kg</td>
+<td align="right">0.247</td>
+<td align="right">0.049</td>
+<td align="right">5.050</td>
+<td align="right">0.000</td>
+</tr>
+<tr class="odd">
+<td align="left">percentage_male</td>
+<td align="right">-0.361</td>
+<td align="right">0.140</td>
+<td align="right">-2.573</td>
+<td align="right">0.010</td>
+</tr>
+<tr class="even">
+<td align="left">generation_grpModern</td>
+<td align="right">9.113</td>
+<td align="right">5.501</td>
+<td align="right">1.657</td>
+<td align="right">0.098</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code># Serg - Hypothesis testing using linear regression
+  # RQ: Is there a relationship between capture rate and overall combat effectiveness?
+
+# serg - selecting analytic sample + covariates
+
+library(gtsummary)
+library(sjPlot)</code></pre>
+<pre><code>## Warning: package &#39;sjPlot&#39; was built under R version 4.5.2</code></pre>
+<pre><code>## 
+## Attaching package: &#39;sjPlot&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     set_theme</code></pre>
+<pre class="r"><code>capture_stats &lt;- poke_tidy |&gt;
+  mutate(
+    capture_rate = as.numeric(capture_rate),
+    percentage_male = as.numeric(percentage_male),
+    
+    generation = factor(
+      case_when(
+        generation %in% c(&quot;1&quot;,&quot;2&quot;,&quot;3&quot;) ~ &quot;Early&quot;,
+        generation %in% c(&quot;4&quot;,&quot;5&quot;,&quot;6&quot;,&quot;7&quot;) ~ &quot;Modern&quot;
+      ),
+      levels = c(&quot;Early&quot;, &quot;Modern&quot;)
+    )
+  ) |&gt;
+  filter(
+    is_legendary == FALSE,
+    if_all(c(capture_rate, base_total, height_m,
+             percentage_male, weight_kg, generation), ~ !is.na(.x))
+  )</code></pre>
+<pre><code>## Warning: There was 1 warning in `mutate()`.
+## ℹ In argument: `capture_rate = as.numeric(capture_rate)`.
+## Caused by warning:
+## ! NAs introduced by coercion</code></pre>
+<pre class="r"><code># running linear regression model
+
+capture_stats_lm = lm(
+  base_total ~ capture_rate + height_m + 
+    weight_kg + percentage_male + generation,
+  data = capture_stats
+)
+
+summary(capture_stats_lm)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = base_total ~ capture_rate + height_m + weight_kg + 
+##     percentage_male + generation, data = capture_stats)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -309.936  -36.895    3.166   37.754  258.690 
+## 
+## Coefficients:
+##                   Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)      482.90684   11.99129  40.271  &lt; 2e-16 ***
+## capture_rate      -0.85462    0.04146 -20.615  &lt; 2e-16 ***
+## height_m          20.55383    3.81794   5.383 1.01e-07 ***
+## weight_kg          0.24705    0.04892   5.050 5.70e-07 ***
+## percentage_male   -0.36099    0.14029  -2.573   0.0103 *  
+## generationModern   9.11267    5.50052   1.657   0.0980 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 70.58 on 671 degrees of freedom
+## Multiple R-squared:  0.5629, Adjusted R-squared:  0.5596 
+## F-statistic: 172.8 on 5 and 671 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre class="r"><code>tbl_regression(
+  capture_stats_lm,
+  intercept = TRUE,
+  estimate_fun = ~ style_number(.x, digits = 2),
+  pvalue_fun = ~ style_pvalue(.x),
+  label = list(
+    capture_rate ~ &quot;Capture Rate&quot;,
+    height_m ~ &quot;Height (m)&quot;,
+    weight_kg ~ &quot;Weight (kg)&quot;,
+    percentage_male ~ &quot;Percentage Male&quot;,
+    generation ~ &quot;Generation (ref = Early)&quot;
+  )
+) |&gt; 
+  modify_header(label = &quot;**Predictors**&quot;)</code></pre>
+<div id="mwyfsjqbus" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#mwyfsjqbus table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#mwyfsjqbus thead, #mwyfsjqbus tbody, #mwyfsjqbus tfoot, #mwyfsjqbus tr, #mwyfsjqbus td, #mwyfsjqbus th {
+  border-style: none;
+}
+
+#mwyfsjqbus p {
+  margin: 0;
+  padding: 0;
+}
+
+#mwyfsjqbus .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#mwyfsjqbus .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#mwyfsjqbus .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#mwyfsjqbus .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#mwyfsjqbus .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#mwyfsjqbus .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#mwyfsjqbus .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#mwyfsjqbus .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#mwyfsjqbus .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#mwyfsjqbus .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#mwyfsjqbus .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#mwyfsjqbus .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#mwyfsjqbus .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#mwyfsjqbus .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#mwyfsjqbus .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#mwyfsjqbus .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#mwyfsjqbus .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#mwyfsjqbus .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#mwyfsjqbus .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#mwyfsjqbus .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#mwyfsjqbus .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#mwyfsjqbus .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#mwyfsjqbus .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#mwyfsjqbus .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#mwyfsjqbus .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#mwyfsjqbus .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#mwyfsjqbus .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#mwyfsjqbus .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#mwyfsjqbus .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#mwyfsjqbus .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#mwyfsjqbus .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#mwyfsjqbus .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#mwyfsjqbus .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#mwyfsjqbus .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#mwyfsjqbus .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#mwyfsjqbus .gt_left {
+  text-align: left;
+}
+
+#mwyfsjqbus .gt_center {
+  text-align: center;
+}
+
+#mwyfsjqbus .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#mwyfsjqbus .gt_font_normal {
+  font-weight: normal;
+}
+
+#mwyfsjqbus .gt_font_bold {
+  font-weight: bold;
+}
+
+#mwyfsjqbus .gt_font_italic {
+  font-style: italic;
+}
+
+#mwyfsjqbus .gt_super {
+  font-size: 65%;
+}
+
+#mwyfsjqbus .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#mwyfsjqbus .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#mwyfsjqbus .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#mwyfsjqbus .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#mwyfsjqbus .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#mwyfsjqbus .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#mwyfsjqbus .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#mwyfsjqbus .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#mwyfsjqbus div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_left" rowspan="1" colspan="1" scope="col" id="label"><span class='gt_from_md'><strong>Predictors</strong></span></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="estimate"><span class='gt_from_md'><strong>Beta</strong></span></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="conf.low"><span class='gt_from_md'><strong>95% CI</strong></span></th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_center" rowspan="1" colspan="1" scope="col" id="p.value"><span class='gt_from_md'><strong>p-value</strong></span></th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="label" class="gt_row gt_left">(Intercept)</td>
+<td headers="estimate" class="gt_row gt_center">482.91</td>
+<td headers="conf.low" class="gt_row gt_center">459.36, 506.45</td>
+<td headers="p.value" class="gt_row gt_center"><0.001</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">Capture Rate</td>
+<td headers="estimate" class="gt_row gt_center">-0.85</td>
+<td headers="conf.low" class="gt_row gt_center">-0.94, -0.77</td>
+<td headers="p.value" class="gt_row gt_center"><0.001</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">Height (m)</td>
+<td headers="estimate" class="gt_row gt_center">20.55</td>
+<td headers="conf.low" class="gt_row gt_center">13.06, 28.05</td>
+<td headers="p.value" class="gt_row gt_center"><0.001</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">Weight (kg)</td>
+<td headers="estimate" class="gt_row gt_center">0.25</td>
+<td headers="conf.low" class="gt_row gt_center">0.15, 0.34</td>
+<td headers="p.value" class="gt_row gt_center"><0.001</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">Percentage Male</td>
+<td headers="estimate" class="gt_row gt_center">-0.36</td>
+<td headers="conf.low" class="gt_row gt_center">-0.64, -0.09</td>
+<td headers="p.value" class="gt_row gt_center">0.010</td></tr>
+    <tr><td headers="label" class="gt_row gt_left">Generation (ref = Early)</td>
+<td headers="estimate" class="gt_row gt_center"><br /></td>
+<td headers="conf.low" class="gt_row gt_center"><br /></td>
+<td headers="p.value" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Early</td>
+<td headers="estimate" class="gt_row gt_center">—</td>
+<td headers="conf.low" class="gt_row gt_center">—</td>
+<td headers="p.value" class="gt_row gt_center"><br /></td></tr>
+    <tr><td headers="label" class="gt_row gt_left">    Modern</td>
+<td headers="estimate" class="gt_row gt_center">9.11</td>
+<td headers="conf.low" class="gt_row gt_center">-1.69, 19.91</td>
+<td headers="p.value" class="gt_row gt_center">0.10</td></tr>
+  </tbody>
+  <tfoot>
+    <tr class="gt_sourcenotes">
+      <td class="gt_sourcenote" colspan="4"><span class='gt_from_md'>Abbreviation: CI = Confidence Interval</span></td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+<div id="hypotheses-1" class="section level4">
+<h4>Hypotheses</h4>
+<p>As Pokémon data nerds, we were interested in examining whether a
+Pokemon’s capture rate is related to its overall combat potential, which
+is relevant information for casual Pokémon players and competitive
+trainers. Thus, we examined whether Pokémon that are harder to catch
+tend to have higher base stat totals.</p>
+<p>Our conceptual hypothesis is that performance contributes to capture
+difficulty, meaning that stronger Pokémon are designed to be more
+challenging to catch. To evaluate this relationship, we tested the
+following hypotheses:</p>
+<ul>
+<li><p>H₀: There is no linear relationship between
+<code>capture_rate</code> and <code>base_total</code> among
+non-legendary Pokémon, after accounting for key demographic
+variables</p></li>
+<li><p>H₁: There is a significant negative relationship between
+<code>capture_rate</code> and <code>base_total</code> (harder-to-catch
+Pokémon tend to be stronger), after accounting for key demographic
+variables</p></li>
+</ul>
+</div>
+<div id="measures" class="section level4">
+<h4>Measures</h4>
+<ul>
+<li><p>Exposure (predictor):<code>capture_rate</code> represents how
+easy a Pokémon can be caught, meaning that higher values = easier to
+catch. This variable was cleaned and recoded as a numeric, continuous
+variable to correctly model the linear relationship and test our
+hypothesis.</p></li>
+<li><p>Outcome (dependent): <code>base_total</code> is the sum of a
+Pokemon’s six base total stats, including <code>hp</code>,
+<code>attack</code>, <code>defense</code>, <code>sp_attack</code>,
+<code>sp_defense</code>, and <code>speed</code>. This variable will
+serve as a proxy to assess overall combat effectiveness.</p></li>
+</ul>
+</div>
+<div id="covariates" class="section level4">
+<h4>Covariates</h4>
+<p>Several species-characteristics were included as covariates in the
+linear regression model to address potential confounding and improve
+model precision. These variables were chosen based on their plausible
+relationships with both <code>capture_rate</code> (main predictor) and
+<code>base_total</code> (main outcome of interest), as well as their
+relevancy to the universe design and any other factors that could bias
+our results. These covariates included:</p>
+<ul>
+<li><code>height_m</code>: This represents the physical size of the
+Pokémon. This variable was selected as a covariate because larger
+species could exhibit higher base stats and may have lower capture
+rates, making height a potential confounder.</li>
+<li><code>weight_kg</code>: This represents the body mass index of the
+Pokémon. This variable was selected as a covariate because heavier
+Pokémon could have higher combat stats, as well as influence catch rate
+difficulty.</li>
+<li><code>percentage_male</code>: This represents the proportion of male
+species in the dataset.Some species may have sex-based differences when
+it comes to stats, so sex distribution could correlate with combat
+potential. This variable also helps account for any sex/gender related
+differences.</li>
+<li><code>generation</code>: This represents the generation in which the
+Pokémon was first introduced. This variable was accounted for, as
+adjusting for it could control for systematic differences across
+generations due to temporal decision-making around stats or design based
+on generation. This variable was re-coded as a binary variable to
+capture contemporary differences across two chunks of Pokémon
+generations, where <strong>Early</strong> represents gens 1, 2, and 3,
+whereas <strong>Modern</strong> represents gens 4, 5, 6, and 7.</li>
+</ul>
+<p>Altogether, these covariates are meant to adjust for any potential
+differences across species, reduce biased estimates, and isolate the
+association between capture rate and overall base stats to assess combat
+effectiveness.</p>
+</div>
+<div id="interpretation-of-regression-analysis" class="section level4">
+<h4>Interpretation of regression analysis</h4>
+<p>Among all non-legendary Pokémon included our cross-generational
+dataset of the Pokémon universe, we observed a significant negative
+association between <code>capture_rate</code> and
+<code>base_total</code>. More specifically, for every one-unit increase
+in <code>capture_rate</code>, meaning easier to catch,
+<code>base_total</code> decreased by about 0.87 points <strong>(β =
+−0.87, 95% CI: −0.96, −0.79; p &lt; 0.001)</strong>. These results
+suggest that species designed to be harder to catch tend to possess
+higher combat power than those who are easier to catch.</p>
+<p>At the 5% significance level, the association between
+<code>capture_rate</code> and <code>base_total</code> is statistically
+significant, after adjusting for <code>height_m</code>,
+<code>weight_kg</code>, <code>percentage_male</code>, and
+<code>generation</code>. Therefore, we reject the null hypothesis that
+there is no linear relationship between the exposure and outcome of
+interest.</p>
+</div>
+</div>
+<div id="a-two-sample-t-test-of-dual-type-vs-single-type-pokémons"
+class="section level2">
+<h2>A Two-Sample T-Test of Dual-Type vs Single-Type Pokémons</h2>
+<pre class="r"><code># serg - running two sample t test to explore whether dual-type pokemon have statistical advantages over single-type ones
+poke_2tt = poke_tidy |&gt; 
+  mutate(
+    type2 = str_to_title(type2),
+    dual_type = if_else(type2 == &quot;None&quot;, &quot;Single&quot;, &quot;Dual&quot;)
+  )
+
+tt_result = t.test(
+  base_total ~ dual_type,
+  data = poke_2tt,
+  var.equal = FALSE
+)
+
+tt_result</code></pre>
+<pre><code>## 
+##  Welch Two Sample t-test
+## 
+## data:  base_total by dual_type
+## t = 4.388, df = 796.49, p-value = 1.298e-05
+## alternative hypothesis: true difference in means between group Dual and group Single is not equal to 0
+## 95 percent confidence interval:
+##  20.19406 52.88657
+## sample estimates:
+##   mean in group Dual mean in group Single 
+##             445.8945             409.3542</code></pre>
+<pre class="r"><code>poke_2tt |&gt; 
+  group_by(dual_type) |&gt; 
+  summarise(
+    n = n(),
+    mean_stat = mean(base_total, na.rm = TRUE),
+    sd_stat = sd(base_total, na.rm = TRUE)
+  )</code></pre>
+<div data-pagedtable="false">
+<script data-pagedtable-source type="application/json">
+{"columns":[{"label":["dual_type"],"name":[1],"type":["chr"],"align":["left"]},{"label":["n"],"name":[2],"type":["int"],"align":["right"]},{"label":["mean_stat"],"name":[3],"type":["dbl"],"align":["right"]},{"label":["sd_stat"],"name":[4],"type":["dbl"],"align":["right"]}],"data":[{"1":"Dual","2":"417","3":"445.8945","4":"119.3541"},{"1":"Single","2":"384","3":"409.3542","4":"116.2354"}],"options":{"columns":{"min":{},"max":[10]},"rows":{"min":[10],"max":[10]},"pages":{}}}
+  </script>
+</div>
+<pre class="r"><code>ggplot(poke_2tt, aes(x = dual_type, y = base_total, fill = dual_type)) +
+  geom_violin(trim = FALSE) +
+  geom_boxplot(width = 0.2, alpha = 0.5) +
+  labs(
+    x = &quot;Pokémon Typing&quot;,
+    y = &quot;Total Base Stats&quot;,
+    title = &quot;Single-Type vs Dual-Type Pokémon: Total Stats Comparison&quot;
+  )</code></pre>
+<p><img src="workingdoc_files/figure-html/dual%20and%20single%20type%20t-test-1.png" width="90%" /></p>
+<div id="hypotheses-2" class="section level4">
+<h4>Hypotheses</h4>
+<p>We next examined whether dual-type Pokémon have a statistical
+advantage over single type Pokémon in terms of overall combat strengthe.
+More specifically, we wanted to test whether the total base stats differ
+between single_type and dual-type Pokémons.</p>
+<p>The following analysis will explore these hypotheses:</p>
+<ul>
+<li><p>H₀: There is no difference in mean <code>base_total</code>
+between single-type and dual-type Pokémon</p></li>
+<li><p>H₁: There is a difference in mean <code>base_total</code> between
+single-type and dual-type Pokémon</p></li>
+</ul>
+</div>
+<div id="measures-1" class="section level4">
+<h4>Measures</h4>
+<p>We first created a binary type variable (i.e.,
+<code>dual_type</code>), where we recoded observations as
+<strong>Single</strong> for Pokémon with only a primary type (i.e.,
+<code>type2 == "None"</code>) and <strong>Dual</strong> for those with
+both primary and secondary types. Our outcome variable,
+<code>base_total</code>, represents the sum of each Pokemon’s six base
+stats, including <code>hp</code>, <code>attack</code>,
+<code>defense</code>, <code>sp_attack</code>, <code>sp_defense</code>,
+and <code>speed</code>, which will serve as a proxy to measure overall
+combat potential.</p>
+<p>To compare mean <code>base_total</code> between single type and dual
+type species, we used a two-sample t-test, which allows for unequal
+variances, with <code>base_total</code> as the continuous outcome and
+<code>dual_typ</code> as the grouping variable. We also plotted the
+distribution of total stats using violin and boxplots to assess overlap
+and spread between both groups.</p>
+</div>
+<div id="results" class="section level4">
+<h4>Results</h4>
+<p>On average, Dual-type Pokémon had higher total base stats than
+single-type Pokémon, as evidenced by a mean of 445.9 compared to 409.9.
+The difference of about 36.5 points higher tell us there results were
+statistically significant, as noted below:</p>
+<ul>
+<li>t = 4.39</li>
+<li>df = 796.5</li>
+<li>p = 1.30 × 10^5</li>
+<li>95% CI: 20.2 to 52.9</li>
+</ul>
+<p>Given these results and because the confidence interval does not
+include the value of zero and the p-value is far below 0.05%, we reject
+the null hypothesis that there are no mean differences between
+single-type and dual-type Pokémons. These results show that dual-type
+species tend to have higher base total stats than those with only one
+type.</p>
+</div>
+<div id="violin-boxplot-interpretation-conclusions"
+class="section level4">
+<h4>Violin + Boxplot Interpretation &amp; Conclusions</h4>
+<p>To visualize the distribution of total base stats between dual-type
+and single-type Pokémons, <strong>a violin, box-plot was
+created</strong>. As noted on the plot, we see that the distribution for
+dual-type Pokémons shifted upwards, indicating higher median and a
+denser cluster of higher-stat Pokémon than those with a single-type.
+Both groups, however, do show variability, with dual-type Pokémon
+dominating the upper half of the stat range. The overlap between both
+groups lets us know that type alone does not determine strengthen.
+However, we can conclude that the average advantage of dual-type
+Pokémons is consistent.</p>
+<p>Overall, although both groups do include strong and weak species,
+having two types is associated with a statistical advantage in overall
+combat potential. It is important to consider that generation design
+differences may play a role in this association, as later generations
+could emphasize duality in Pokémon species as more powerful, and, by
+extension, over better stat distribution. We can also conclude that
+having a second type offers more resistance and flexibility in combat
+against single-type Pokémons and could serve as advantage in moderating
+the effect of an effectiveness against one of the two types in dual-type
+Pokémons.</p>
+</div>
+</div>
+<div id="project-report" class="section level1">
+<h1>Project Report</h1>
+<div id="motivation" class="section level2">
+<h2>1. Motivation</h2>
+<p>As lifelong Pokémon players,</p>
+</div>
+<div id="initial-questions" class="section level2">
+<h2>2. Initial questions:</h2>
+</div>
+<div id="data" class="section level2">
+<h2>3. Data:</h2>
+<div id="data-source" class="section level3">
+<h3>3.1. Data source</h3>
+<p>Our data source came from []</p>
+</div>
+<div id="data-cleaning-rocess" class="section level3">
+<h3>3.2. Data cleaning rocess</h3>
+</div>
+<div id="final-dataset" class="section level3">
+<h3>3.3. Final dataset</h3>
+</div>
+</div>
+</div>
+
+
+
+</div>
+</div>
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+<script>
+$(document).ready(function ()  {
+
+    // temporarily add toc-ignore selector to headers for the consistency with Pandoc
+    $('.unlisted.unnumbered').addClass('toc-ignore')
+
+    // move toc-ignore selectors from section div to header
+    $('div.section.toc-ignore')
+        .removeClass('toc-ignore')
+        .children('h1,h2,h3,h4,h5').addClass('toc-ignore');
+
+    // establish options
+    var options = {
+      selectors: "h1,h2,h3",
+      theme: "bootstrap3",
+      context: '.toc-content',
+      hashGenerator: function (text) {
+        return text.replace(/[.\\/?&!#<>]/g, '').replace(/\s/g, '_');
+      },
+      ignoreSelector: ".toc-ignore",
+      scrollTo: 0
+    };
+    options.showAndHide = true;
+    options.smoothScroll = true;
+
+    // tocify
+    var toc = $("#TOC").tocify(options).data("toc-tocify");
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
