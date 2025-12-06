@@ -545,6 +545,13 @@ library(sjPlot)
 
     ## Warning: package 'sjPlot' was built under R version 4.5.2
 
+    ## 
+    ## Attaching package: 'sjPlot'
+
+    ## The following object is masked from 'package:ggplot2':
+    ## 
+    ##     set_theme
+
 ``` r
 capture_stats <- poke_tidy |>
   mutate(
