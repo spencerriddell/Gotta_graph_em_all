@@ -33,6 +33,10 @@
 <link href="site_libs/tocify-1.9.1/jquery.tocify.css" rel="stylesheet" />
 <script src="site_libs/tocify-1.9.1/jquery.tocify.js"></script>
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
+<<<<<<< HEAD
+=======
+<script src="site_libs/navigation-1.1/codefolding.js"></script>
+>>>>>>> 8452616e6eb6a9e7208699ceaa6521d24b8dcf40
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
 <link href="site_libs/pagedtable-1.1/css/pagedtable.css" rel="stylesheet" />
@@ -222,6 +226,12 @@ $(document).ready(function () {
 </style>
 
 <!-- code folding -->
+<<<<<<< HEAD
+=======
+<style type="text/css">
+.code-folding-btn { margin-bottom: 4px; }
+</style>
+>>>>>>> 8452616e6eb6a9e7208699ceaa6521d24b8dcf40
 
 
 
@@ -325,7 +335,11 @@ div.tocify {
   <a href="index.html">Home</a>
 </li>
 <li>
+<<<<<<< HEAD
   <a href="about.html">About our Trainers</a>
+=======
+  <a href="about.html">Meet the Trainers</a>
+>>>>>>> 8452616e6eb6a9e7208699ceaa6521d24b8dcf40
 </li>
 <li>
   <a href="eda.html">Exploratory Data Analysis</a>
@@ -337,7 +351,11 @@ div.tocify {
   <a href="final_report.html">Final Report</a>
 </li>
 <li>
+<<<<<<< HEAD
   <a href="contact.html">Contact Us</a>
+=======
+  <a href="screencast.html">Screencast</a>
+>>>>>>> 8452616e6eb6a9e7208699ceaa6521d24b8dcf40
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -349,6 +367,17 @@ div.tocify {
 
 <div id="header">
 
+<<<<<<< HEAD
+=======
+<div class="btn-group pull-right float-right">
+<button type="button" class="btn btn-default btn-xs btn-secondary btn-sm dropdown-toggle" data-toggle="dropdown" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false"><span>Code</span> <span class="caret"></span></button>
+<ul class="dropdown-menu dropdown-menu-right" style="min-width: 50px;">
+<li><a id="rmd-show-all-code" href="#">Show All Code</a></li>
+<li><a id="rmd-hide-all-code" href="#">Hide All Code</a></li>
+</ul>
+</div>
+
+>>>>>>> 8452616e6eb6a9e7208699ceaa6521d24b8dcf40
 
 
 <h1 class="title toc-ignore">Final Report</h1>
@@ -375,7 +404,11 @@ characteristics (type, stats, physical traits, rarity) and combat
 effectiveness using rigorous statistical methods. Beyond satisfying our
 curiosity, this project aims to provide actionable insights that can
 enhance team-building strategies for both casual players and competitive
+<<<<<<< HEAD
 trainers. By analyzing 802 Pokémon across seven generations using
+=======
+trainers. By analyzing 801 Pokémon across seven generations using
+>>>>>>> 8452616e6eb6a9e7208699ceaa6521d24b8dcf40
 classification algorithms, hypothesis testing, and regression modeling,
 we seek to answer: Can data science reveal the hidden ‘rules’ that
 govern Pokémon strength?”</p>
@@ -402,7 +435,11 @@ Attack)</li>
 <p><em>Motivation:</em> If types have distinctive stat signatures, this
 reveals fundamental design principles in the Pokémon universe and helps
 players identify type weaknesses based on stat patterns. This question
+<<<<<<< HEAD
 evolved from initial exploratory boxplots showing type differences—we
+=======
+evolved from initial exploratory boxplots showing type differences; we
+>>>>>>> 8452616e6eb6a9e7208699ceaa6521d24b8dcf40
 formalized it into a classification problem to quantify
 predictability.</p>
 <p><strong>Research Question 2 (Dual-Type Advantage):</strong></p>
@@ -471,21 +508,55 @@ higher = easier), <code>generation</code> (1-7),
 names to snake_case for consistency. - Treated standard placeholders
 (e.g., blank strings, <code>"NA"</code>, <code>"."</code>) as missing
 values during import.</p>
+<<<<<<< HEAD
+=======
+<pre class="r"><code>library(tidyverse)
+
+# Load raw data and standardize variable names
+poke_tidy &lt;- read_csv(&quot;./Data/pokemon.csv&quot;, na = c(&quot;NA&quot;, &quot;.&quot;, &quot;&quot;)) |&gt; 
+  janitor::clean_names()</code></pre>
+>>>>>>> 8452616e6eb6a9e7208699ceaa6521d24b8dcf40
 <p><em>Step 2: Type Variable Recoding</em> - Recoded missing
 <code>type2</code> values as <code>"None"</code> to distinguish truly
 single-type Pokémon from missing data. - Standardized type names to
 title case. - Removed duplicate entries based on Pokémon name, keeping
 one record per species.</p>
+<<<<<<< HEAD
+=======
+<pre class="r"><code># Recode missing type2 and standardize type names
+poke_tidy &lt;- poke_tidy |&gt; 
+  mutate(
+    type2 = ifelse(is.na(type2), &quot;None&quot;, type2),
+    type1 = str_to_title(type1),
+    type2 = str_to_title(type2)
+  ) |&gt; 
+  distinct(name, .keep_all = TRUE)</code></pre>
+>>>>>>> 8452616e6eb6a9e7208699ceaa6521d24b8dcf40
 <p><em>Step 3: Type Conversions</em> - Converted categorical variables
 (<code>type1</code>, <code>type2</code>, and <code>generation</code>) to
 factors for proper statistical modeling. - Ensured boolean variable
 (<code>is_legendary</code>) was stored as a logical variable.</p>
+<<<<<<< HEAD
+=======
+<pre class="r"><code># Clean abilities field
+poke_tidy &lt;- poke_tidy |&gt; 
+  mutate(
+    abilities = str_remove_all(abilities, &quot;\\[|\\]|&#39;&quot;)
+  )
+
+# Create genderless indicator
+poke_tidy &lt;- poke_tidy |&gt; 
+  mutate(
+    genderless = ifelse(is.na(percentage_male), TRUE, FALSE)
+  )</code></pre>
+>>>>>>> 8452616e6eb6a9e7208699ceaa6521d24b8dcf40
 <p><em>Step 4: Numeric Coercion</em> - Some stat and related variables
 were stored as character due to parsing issues. - Certain
 <code>capture_rate</code> entries used composite strings for Pokémon
 with multiple forms. - These non-standard entries produced NA values
 upon numeric coercion, which were subsequently excluded in complete-case
 analyses.</p>
+<<<<<<< HEAD
 <p><em>Step 5: Analysis-Specific Preparation</em></p>
 <ul>
 <li><p>Research Question 1 (Type Prediction): Used all Pokémon with
@@ -498,14 +569,99 @@ test sets.</p></li>
 with non-missing <code>base_total</code> and type information were
 included.</p></li>
 <li><p>Research Question 3 (Capture Rate): Excluded legendary Pokémon,
+=======
+<pre class="r"><code># Convert categorical variables to factors for modeling
+poke_tidy &lt;- poke_tidy |&gt; 
+  mutate(
+    type1 = factor(type1),
+    type2 = factor(type2),
+    generation = factor(generation),
+    is_legendary = as.logical(is_legendary)
+  )</code></pre>
+<p><em>Step 5: Analysis-Specific Preparation</em></p>
+<ul>
+<li>Research Question 1 (Type Prediction): Used all Pokémon with
+complete data on <code>type1</code> and the six base stats when fitting
+the random forest model; an 80/20 stratified split created training and
+test sets.</li>
+</ul>
+<pre class="r"><code>library(caret)
+
+poke_type &lt;- poke_tidy |&gt; 
+  select(type1, hp, attack, defense, sp_attack, sp_defense, speed) |&gt; 
+  mutate(type1 = as.factor(type1))
+
+# 80/20 train-test split
+set.seed(123)
+
+train_index &lt;- createDataPartition(poke_type[[&quot;type1&quot;]], 
+                                   p = 0.8, list = FALSE)
+
+train_set &lt;- poke_type[train_index, ]
+test_set  &lt;- poke_type[-train_index, ]</code></pre>
+<ul>
+<li>Research Question 2 (Dual-Type Comparison): Created a binary
+<code>dual_type</code> variable, labeling Pokémon as <em>Single</em> if
+<code>type2 == "None"</code> and <em>Dual</em> otherwise. All Pokémon
+with non-missing <code>base_total</code> and type information were
+included.</li>
+</ul>
+<pre class="r"><code>capture_stats &lt;- poke_tidy |&gt;
+  mutate(
+    capture_rate    = as.numeric(capture_rate),
+    percentage_male = as.numeric(percentage_male),
+    generation_grp  = case_when(
+      generation %in% c(&quot;1&quot;,&quot;2&quot;,&quot;3&quot;) ~ &quot;Early&quot;,
+      generation %in% c(&quot;4&quot;,&quot;5&quot;,&quot;6&quot;,&quot;7&quot;) ~ &quot;Modern&quot;,
+      TRUE ~ NA_character_
+    )
+  ) |&gt;
+  mutate(
+    generation_grp = factor(generation_grp, levels = c(&quot;Early&quot;, &quot;Modern&quot;))
+  ) |&gt;
+  filter(
+    is_legendary == FALSE,
+    !is.na(capture_rate),
+    !is.na(base_total),
+    !is.na(height_m),
+    !is.na(weight_kg),
+    !is.na(percentage_male),
+    !is.na(generation_grp)
+  )</code></pre>
+<ul>
+<li>Research Question 3 (Capture Rate): Excluded legendary Pokémon,
+>>>>>>> 8452616e6eb6a9e7208699ceaa6521d24b8dcf40
 whose capture mechanics and stats differ systematically from regular
 species. Recoded <code>generation</code> into <code>"Early"</code> (1–3)
 and <code>"Modern"</code> (4–7) for interpretability. Restricted to
 observations with non-missing <code>capture_rate</code>,
 <code>base_total</code>, <code>height_m</code>, <code>weight_kg</code>,
 <code>percentage_male</code>, and <code>generation</code>, yielding a
+<<<<<<< HEAD
 complete-case analytic sample.</p></li>
 </ul>
+=======
+complete-case analytic sample.</li>
+</ul>
+<pre class="r"><code>capture_stats &lt;- poke_tidy |&gt;
+  mutate(
+    capture_rate = as.numeric(capture_rate),
+    percentage_male = as.numeric(percentage_male),
+    
+    generation = factor(
+      case_when(
+        generation %in% c(&quot;1&quot;,&quot;2&quot;,&quot;3&quot;) ~ &quot;Early&quot;,
+        generation %in% c(&quot;4&quot;,&quot;5&quot;,&quot;6&quot;,&quot;7&quot;) ~ &quot;Modern&quot;
+      ),
+      levels = c(&quot;Early&quot;, &quot;Modern&quot;)
+    )
+  ) |&gt;
+  filter(
+    is_legendary == FALSE,
+    if_all(c(capture_rate, base_total, height_m,
+             percentage_male, weight_kg, generation), ~ !is.na(.x))
+  )</code></pre>
+>>>>>>> 8452616e6eb6a9e7208699ceaa6521d24b8dcf40
 <p><strong>Data Quality &amp; Limitations</strong></p>
 <p><em>Issues encountered:</em></p>
 <ul>
@@ -545,6 +701,7 @@ importance metrics.</p>
 <p><em>Sample:</em> All Pokémon with complete data on the six base stats
 and primary type were eligible; an 80/20 stratified split ensured
 similar type distributions in training and test sets.</p>
+<<<<<<< HEAD
 <p><em>Approach:</em> - Train/Test Split: 80% training set, 20% test set
 using stratified sampling on <code>type1</code>. - Model Specification:
 Random forest classifier with 500 trees <code>(ntree = 500)</code> and
@@ -552,6 +709,19 @@ default mtry - Predictors: Six base stats (<code>hp</code>,
 <code>attack</code>, <code>defense</code>, <code>sp_attack</code>,
 <code>sp_defense</code>, <code>speed</code>) - Outcome:
 <code>type1</code> (18 categories)</p>
+=======
+<p><em>Approach:</em></p>
+<ul>
+<li><p>Train/Test Split: 80% training set, 20% test set using stratified
+sampling on <code>type1</code>.</p></li>
+<li><p>Model Specification: Random forest classifier with 500 trees
+<code>(ntree = 500)</code> and default mtry</p></li>
+<li><p>Predictors: Six base stats (<code>hp</code>, <code>attack</code>,
+<code>defense</code>, <code>sp_attack</code>, <code>sp_defense</code>,
+<code>speed</code>)</p></li>
+<li><p>Outcome: <code>type1</code> (18 categories)</p></li>
+</ul>
+>>>>>>> 8452616e6eb6a9e7208699ceaa6521d24b8dcf40
 <p><em>Evaluation Metrics:</em></p>
 <ul>
 <li>Overall accuracy: Proportion of correctly classified Pokémon in the
@@ -575,6 +745,7 @@ is a standard application of the two-sample t-test</p>
 and type information. Group sizes correspond to the counts of species
 with and without a secondary type (<code>type2</code> equal to
 <code>"None"</code> vs. any other value).</p>
+<<<<<<< HEAD
 <p><em>Approach:</em> - Grouping variable: <code>dual_type</code> with
 two levels: <code>Single</code> (no secondary type) and
 <code>Dual</code> (has secondary type). Created <code>dual_type</code>
@@ -582,6 +753,20 @@ two levels: <code>Single</code> (no secondary type) and
 <code>base_total</code> (continuous, sum of six base stats) - Test type:
 Welch’s two-sample t-test, which does not assume equal variances between
 groups. - Significance level: α = 0.05</p>
+=======
+<p><em>Approach:</em></p>
+<ul>
+<li><p>Grouping variable: <code>dual_type</code> with two levels:
+<code>Single</code> (no secondary type) and <code>Dual</code> (has
+secondary type). Created <code>dual_type</code> (Single vs. Dual) from
+<code>type2</code>.</p></li>
+<li><p>Outcome: <code>base_total</code> (continuous, sum of six base
+stats)</p></li>
+<li><p>Test type: Welch’s two-sample t-test, which does not assume equal
+variances between groups.</p></li>
+<li><p>Significance level: α = 0.05</p></li>
+</ul>
+>>>>>>> 8452616e6eb6a9e7208699ceaa6521d24b8dcf40
 <p><em>Assumptions Checked:</em></p>
 <ul>
 <li>Independence: Each Pokémon species appears once in the dataset after
@@ -791,6 +976,24 @@ class="uri">https://www.kaggle.com/datasets/rounakbanik/pokemon</a></li>
 </ul>
 </div>
 
+<<<<<<< HEAD
+=======
+<div class="site-footer" style="margin-top:40px;padding:16px 0;border-top:1px solid #e6e6e6;font-family:Montserrat,Arial,sans-serif;font-size:14px; color:#333;">
+  <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:12px;">
+    <div>
+      <strong>Data source:</strong>
+      <a href="https://www.kaggle.com/datasets/rounakbanik/pokemon" target="_blank" rel="noopener">Pokémon dataset (Kaggle)</a>
+    </div>
+    <div>
+      <strong>GitHub repo:</strong>
+      <a href="https://github.com/mb5357/Gotta_graph_em_all" target="_blank" rel="noopener">mb5357/Gotta_graph_em_all</a>
+    </div>
+  </div>
+  <div style="opacity:.7;margin-top:8px;">
+    © 2025 Gotta Graph ’Em All · Built with love
+  </div>
+</div>
+>>>>>>> 8452616e6eb6a9e7208699ceaa6521d24b8dcf40
 
 
 </div>
@@ -826,6 +1029,14 @@ $(document).ready(function () {
 </script>
 
 <!-- code folding -->
+<<<<<<< HEAD
+=======
+<script>
+$(document).ready(function () {
+  window.initializeCodeFolding("hide" === "show");
+});
+</script>
+>>>>>>> 8452616e6eb6a9e7208699ceaa6521d24b8dcf40
 
 <script>
 $(document).ready(function ()  {

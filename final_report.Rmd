@@ -1,0 +1,402 @@
+---
+title: "Final Report"
+output: 
+  html_document:
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+```{r setup, include=FALSE}
+```
+
+## Motivation
+
+As lifelong Pokémon players, our team has always been curious about the fundamental questions that drive competitive gameplay: What makes a Pokémon strong? How do physical characteristics like height and weight relate to combat performance? Which Pokémon types dominate key stats such as HP, Attack, and Speed? Do dual-type Pokémon have inherent advantages over single-type species?
+
+These questions emerged from years of gameplay experience—battling friends, competing online, and building teams without fully understanding the statistical patterns underlying the Pokémon universe. While players often rely on intuition and trial-and-error, we recognized an opportunity to use data science to uncover the hidden structure behind Pokémon design.
+
+Our primary goal is to explore relationships between Pokémon characteristics (type, stats, physical traits, rarity) and combat effectiveness using rigorous statistical methods. Beyond satisfying our curiosity, this project aims to provide actionable insights that can enhance team-building strategies for both casual players and competitive trainers. By analyzing 801 Pokémon across seven generations using classification algorithms, hypothesis testing, and regression modeling, we seek to answer: Can data science reveal the hidden 'rules' that govern Pokémon strength?"
+
+
+## Research Questions
+
+Our project addresses three distinct research questions, each requiring different statistical approaches:
+
+**Research Question 1 (Type Classification from Stats):**
+
+* Can we predict a Pokémon's primary type based solely on its base stat distribution?
+
+*Hypotheses:*
+
+* H₀: Pokémon stat distributions do not differ significantly across primary types; we cannot predict type from stats better than random chance
+* H₁: Pokémon stat distributions vary systematically by primary type (e.g., Fire types have higher Attack, Psychic types have higher Special Attack)
+
+*Motivation:* If types have distinctive stat signatures, this reveals fundamental design principles in the Pokémon universe and helps players identify type weaknesses based on stat patterns. This question evolved from initial exploratory boxplots showing type differences; we formalized it into a classification problem to quantify predictability.
+
+**Research Question 2 (Dual-Type Advantage):**
+
+* Do dual-type Pokémon have higher total base stats than single-type Pokémon?
+
+*Hypotheses:*
+
+* H₀: There is no difference in mean `base_total` between single-type and dual-type Pokémon (μ_single = μ_dual)
+* H₁: There is a difference in mean `base_total` between single-type and dual-type Pokémon (μ_single ≠ μ_dual)
+
+*Motivation:* Dual typing provides strategic advantages (more resistances, more STAB move coverage), but does this come with a stat penalty for game balance? Or do dual-types receive stat boosts to compensate for added complexity? This question emerged after observing apparent distribution shifts in exploratory density plots.
+
+**Research Question 3 (Capture Rate and Combat Effectiveness):**
+
+* Is there a relationship between how difficult a Pokémon is to catch (capture rate) and its overall combat strength (base stats)?
+
+*Hypotheses:*
+
+* H₀: There is no linear relationship between `capture_rate` and `base_total` in non-legendary Pokémon, after controlling for physical characteristics and generation
+* H₁: There is a significant negative relationship between ``capture_rate` and `base_total` (harder-to-catch Pokémon tend to be stronger), after controlling for covariates
+
+*Motivation:* Players intuitively assume rare Pokémon are stronger, but this had never been tested with proper controls for confounding variables like physical size (which might affect both catchability and stats) and generation (which might reflect evolving design philosophies). We refined this from a simple correlation to multiple regression after recognizing potential confounders.
+
+## Data
+
+We used the **Complete Pokémon Dataset** from **[Kaggle](https://www.kaggle.com/datasets/rounakbanik/pokemon)**, containing comprehensive information on **801 Pokémon** from Generations 1-7. This dataset includes 41 variables covering base stats, types, physical characteristics, battle mechanics, and metadata.
+
+**Key variables used:**
+
+- *Combat stats:* `hp`, `attack`, `defense`, `sp_attack`, `sp_defense`, `speed`, `base_total` (sum of six base stats)
+- *Type information:* `type1` (primary type, 18 categories), `type2` (secondary type or "None")
+- *Physical traits:* `height_m`, `weight_kg`
+- *Rarity & metadata:* `capture_rate` (3-255; higher = easier), `generation` (1-7), `is_legendary`, `percentage_male`
+
+**Data Cleaning Process**
+
+*Step 1: Variable Standardization*
+- Converted all variable names to snake_case for consistency.
+- Treated standard placeholders (e.g., blank strings, `"NA"`, `"."`) as missing values during import.
+
+```{r, message=FALSE}
+
+library(tidyverse)
+
+# Load raw data and standardize variable names
+poke_tidy <- read_csv("./Data/pokemon.csv", na = c("NA", ".", "")) |> 
+  janitor::clean_names()
+
+```
+
+
+*Step 2: Type Variable Recoding*
+- Recoded missing `type2` values as `"None"` to distinguish truly single-type Pokémon from missing data.
+- Standardized type names to title case.
+- Removed duplicate entries based on Pokémon name, keeping one record per species.
+
+```{r, message=FALSE}
+
+# Recode missing type2 and standardize type names
+poke_tidy <- poke_tidy |> 
+  mutate(
+    type2 = ifelse(is.na(type2), "None", type2),
+    type1 = str_to_title(type1),
+    type2 = str_to_title(type2)
+  ) |> 
+  distinct(name, .keep_all = TRUE)
+
+```
+
+
+*Step 3: Type Conversions*
+- Converted categorical variables (`type1`, `type2`, and `generation`) to factors for proper statistical modeling.
+- Ensured boolean variable (`is_legendary`) was stored as a logical variable.
+
+```{r}
+
+# Clean abilities field
+poke_tidy <- poke_tidy |> 
+  mutate(
+    abilities = str_remove_all(abilities, "\\[|\\]|'")
+  )
+
+# Create genderless indicator
+poke_tidy <- poke_tidy |> 
+  mutate(
+    genderless = ifelse(is.na(percentage_male), TRUE, FALSE)
+  )
+
+```
+
+
+*Step 4: Numeric Coercion*
+- Some stat and related variables were stored as character due to parsing issues.
+- Certain `capture_rate` entries used composite strings for Pokémon with multiple forms.
+- These non-standard entries produced NA values upon numeric coercion, which were subsequently excluded in complete-case analyses.
+
+```{r}
+
+# Convert categorical variables to factors for modeling
+poke_tidy <- poke_tidy |> 
+  mutate(
+    type1 = factor(type1),
+    type2 = factor(type2),
+    generation = factor(generation),
+    is_legendary = as.logical(is_legendary)
+  )
+
+```
+
+
+*Step 5: Analysis-Specific Preparation*
+
+- Research Question 1 (Type Prediction):
+Used all Pokémon with complete data on `type1` and the six base stats when fitting the random forest model; an 80/20 stratified split created training and test sets.
+
+```{r, warning=FALSE, message=FALSE}
+
+library(caret)
+
+poke_type <- poke_tidy |> 
+  select(type1, hp, attack, defense, sp_attack, sp_defense, speed) |> 
+  mutate(type1 = as.factor(type1))
+
+# 80/20 train-test split
+set.seed(123)
+
+train_index <- createDataPartition(poke_type[["type1"]], 
+                                   p = 0.8, list = FALSE)
+
+train_set <- poke_type[train_index, ]
+test_set  <- poke_type[-train_index, ]
+```
+
+
+- Research Question 2 (Dual-Type Comparison):
+Created a binary `dual_type` variable, labeling Pokémon as *Single* if `type2 == "None"` and *Dual* otherwise. All Pokémon with non-missing `base_total` and type information were included.
+
+```{r, warning=FALSE}
+
+capture_stats <- poke_tidy |>
+  mutate(
+    capture_rate    = as.numeric(capture_rate),
+    percentage_male = as.numeric(percentage_male),
+    generation_grp  = case_when(
+      generation %in% c("1","2","3") ~ "Early",
+      generation %in% c("4","5","6","7") ~ "Modern",
+      TRUE ~ NA_character_
+    )
+  ) |>
+  mutate(
+    generation_grp = factor(generation_grp, levels = c("Early", "Modern"))
+  ) |>
+  filter(
+    is_legendary == FALSE,
+    !is.na(capture_rate),
+    !is.na(base_total),
+    !is.na(height_m),
+    !is.na(weight_kg),
+    !is.na(percentage_male),
+    !is.na(generation_grp)
+  )
+
+```
+
+
+- Research Question 3 (Capture Rate):
+Excluded legendary Pokémon, whose capture mechanics and stats differ systematically from regular species.
+Recoded `generation` into `"Early"` (1–3) and `"Modern"` (4–7) for interpretability.
+Restricted to observations with non-missing `capture_rate`, `base_total`, `height_m`, `weight_kg`, `percentage_male`, and `generation`, yielding a complete-case analytic sample.
+
+
+```{r, warning=FALSE}
+
+capture_stats <- poke_tidy |>
+  mutate(
+    capture_rate = as.numeric(capture_rate),
+    percentage_male = as.numeric(percentage_male),
+    
+    generation = factor(
+      case_when(
+        generation %in% c("1","2","3") ~ "Early",
+        generation %in% c("4","5","6","7") ~ "Modern"
+      ),
+      levels = c("Early", "Modern")
+    )
+  ) |>
+  filter(
+    is_legendary == FALSE,
+    if_all(c(capture_rate, base_total, height_m,
+             percentage_male, weight_kg, generation), ~ !is.na(.x))
+  )
+
+```
+
+
+**Data Quality & Limitations**
+
+*Issues encountered:*
+
+- A small number of `capture_rate` values used composite strings tied to specific forms, which could not be converted directly to numeric and became missing upon coercion; those rows were dropped in models requiring numeric `capture_rate`.
+- Some primary types had relatively small sample sizes, which affected type-specific prediction accuracy and made some per-type estimates less stable.
+
+**Limitations:**
+
+- The dataset includes Pokémon through Generation 7 and does not cover newer species introduced in later games.
+- Only base stats are used; individual values (IVs), effort values (EVs), natures, abilities in battle, and movesets are not included, so in-game performance cannot be captured fully.
+- The data are cross-sectional by species and cannot address temporal changes within species across game versions.
+
+## Methods (high level)
+
+**Overview**
+We employed three distinct statistical approaches to address our research questions: machine learning classification (Random Forest), parametric hypothesis testing (two-sample t-test), and multivariable regression. All analyses were conducted in R using `tidyverse`, `randomForest`, `caret` and `gtsummary ` packages.
+
+**Research Question 1: Type Prediction (Random Forest Classification)**
+
+*Rationale:* With 18 type categories and potential non-linear relationships between stats and types, Random Forest is ideal for multi-class classification while providing interpretable feature importance metrics.
+
+*Sample:* All Pokémon with complete data on the six base stats and primary type were eligible; an 80/20 stratified split ensured similar type distributions in training and test sets.
+
+*Approach:*
+
+- Train/Test Split: 80% training set, 20% test set using stratified sampling on `type1`.
+
+- Model Specification: Random forest classifier with 500 trees `(ntree = 500)` and default mtry
+
+- Predictors: Six base stats (`hp`, `attack`, `defense`, `sp_attack`, `sp_defense`, `speed`)
+
+- Outcome: `type1` (18 categories)
+
+*Evaluation Metrics:*
+
+- Overall accuracy: Proportion of correctly classified Pokémon in the test set.
+- Baseline comparison: Accuracy from random guessing across 18 types.
+- Success threshold: ≥25% accuracy (about 4.5 times baseline) to indicate strong type signal in stats.
+- Feature importance: Mean Decrease in Gini impurity to identify which stats contribute most to type discrimination.
+- Type-specific accuracy: Per-type accuracy computed from the confusion matrix, used to identify which types are easiest or hardest to predict.
+
+**Research Question 2: Dual-Type Advantage (Two-Sample t-test)**
+
+*Rationale:* Comparing mean total stats between two independent groups (single-type vs. dual-type) with a continuous outcome is a standard application of the two-sample t-test
+
+*Sample:* All Pokémon with non-missing `base_total` and type information. Group sizes correspond to the counts of species with and without a secondary type (`type2` equal to `"None"` vs. any other value).
+
+*Approach:*
+
+- Grouping variable: `dual_type` with two levels: `Single` (no secondary type) and `Dual` (has secondary type). Created `dual_type` (Single vs. Dual) from `type2`.
+
+- Outcome: `base_total` (continuous, sum of six base stats)
+
+- Test type: Welch’s two-sample t-test, which does not assume equal variances between groups.
+
+- Significance level: α = 0.05
+
+*Assumptions Checked:*
+
+- Independence: Each Pokémon species appears once in the dataset after removing duplicates.
+- Approximate normality within groups: Assessed using violin and boxplots of `base_total` by `dual_type`.
+- Variance differences: Accommodated by using Welch’s t-test, which is robust to unequal variances.
+- Effect Size: Mean difference in `base_total` between dual-type and single-type Pokémon, with a 95% confidence interval to quantify magnitude and uncertainty.
+
+**Research Question 3: Capture Rate Regression (Multiple Linear Regression)**
+
+*Rationale:* Multiple linear regression allows assessment of the association between capture rate and total base stats while controlling for covariates that may confound this relationship.
+
+*Sample:* Non-legendary Pokémon with complete data on `capture_rate`, `base_total`, `height_m`, `weight_kg`, `percentage_male`, and `generation` (recoded as Early vs Modern).
+
+*Approach:*
+- Outcome: 
+`base_total` (continuous)
+- Primary predictor: 
+`capture_rate` (continuous; higher values indicate easier-to-catch Pokémon).
+
+*Covariates (confounders):*
+
+- `height_m`: Physical size, potentially related to both capture difficulty and strength.
+- `weight_kg`: Mass, potentially associated with both bulk and capture mechanics.
+- `percentage_male`: Sex ratio, which may correlate with stat distributions in certain species lines.
+- `generation`: Binary factor (`Early` for Generations 1–3, `Modern` for Generations 4–7) to adjust for design shifts over time
+
+*Covariate Justification:*
+
+- Height and weight: Exploratory plots showed that larger Pokémon often have higher base stats, and game mechanics suggest size can influence capture dynamics.
+- Percentage male: Some evolutionary lines exhibit sex-based stat differences, so sex distribution may relate to combat potential.
+- Generation: Power creep and changing design philosophies across generations can affect both capture rates and base stats, making generation a potential confounder.
+
+*Assumptions Checked:*
+
+- Linearity: The relationship between `capture_rate` and `base_total`, as well as between covariates and `base_total`, was examined visually and treated as approximately linear.
+- Independence: Each row represents a distinct Pokémon species.
+- Homoscedasticity: Residuals versus fitted values were inspected to assess constant variance.
+- Normality of residuals: Q–Q plots of residuals were examined and appeared reasonably close to normal.
+
+*Interpretation Focus:*
+
+- Coefficient for `capture_rate`: The expected change in `base_total` for a one-unit increase in capture rate, holding other covariates constant.
+- Statistical significance: Evaluated at α = 0.05 via p-values and confidence intervals.
+- Practical significance: Considered via the magnitude of the capture_rate coefficient and the proportion of variance explained (R²).
+
+**Exploratory Data Analysis (Informed Methods)**
+
+Before formal modeling, we conducted exploratory data analysis to guide decisions:
+
+- Boxplots of `base_total` by `type1` showed differences in central tendency and spread across types but substantial overlap, motivating a predictive classification approach rather than relying solely on ANOVA.
+
+- Distribution plots of `base_total` by single vs dual typing suggested that dual-type Pokémon tended to have somewhat higher total stats, motivating a two-sample comparison.
+
+- Scatterplots of height and weight versus `base_total`, and their relationships with `capture_rate`, supported including these variables as covariates in the regression model.
+
+- Legendary Pokémon had clearly elevated base stat totals and distinct capture mechanics, reinforcing the decision to exclude them from the capture-rate regression to avoid distorting linear trends.
+
+
+## Results (Summary)
+**Research Question 1: Predicting Pokemon Types from Base Stats**
+
+The Random Forest model reached 23.2% accuracy, which is much higher than the 5.6% baseline expected from randomly guessing among 18 possible types. This means that Pokemon base stats do contain real information about type, even though type alone cannot be predicted with very high precision.
+
+The most important predictors were Special Attach, Attack, and Speed, which suggests that offensive stats vary more consistently across types than defensive stats. Some type, such as Normal, Fighting, and Fire, were predicted with the highest accuracy (40-62%), while types with small sample sizes or overlapping stat patterns (such as Ghost, Ice, Fairy, Poison, Ground) had 0% accuracy. 
+
+The results show that there are differences in types in stat distributions, but the overlap across types makes it impossible to make perfect prediction. Overall, the model performed significantly better than chance, which leads us to reject the null hypothesis and conclude that Pokemon types do differ systematically in their stat patterns.
+
+**Research Question 2: Do Dual-Type Pokemon Have Higher Total Base Stats?**
+
+The Welch two-sample t-test showed that dual-type Pokemon have significantly higher total base stats than single-type Pokemon.
+
+* Mean (Dual-type): 445.9
+* Mean (Single-type): 409.4
+* Mean difference: 36.5
+* t = 4.39, p = 1.30 x 10^-5
+* 95% CI: 20.2 to 52.9
+
+Because the confidence interval does not include zero and the p-value is far below 0.05, we reject the null hypothesis. This means dual-type Pokemon tend to be stronger on average when looking at total base stats.
+
+The violin and boxplots support this conclusion visually: dual-type Pokemon show higher median and a larger cluster of high-stat species, even though both groups have wide variation.
+
+**Research Question 3: Does Capture Rate Predict Combat Strength?**
+
+In our multiple linear regression (excluding legendary Pokemon), we found a strong and significant negative association between capture rate and total base stats, even after adjusting for height, weight, percentage male, and generation. 
+
+Key results:
+
+* β = -0.85, p < 0.001
+
+This means that for every 1-unit increase in capture rate (meaning the Pokemon is easier to catch), the `base_total`decrease by about 0.85 points, holding all other variables constant. 
+
+Other covariates (height, weight, and percentage male) were also statistically significant. suggesting that physical characteristics of Pokemon relate to overall combat power. Generation (Modern vs. Early) showed a smaller, borderline effect.
+
+The model explained about 56% of the variance in base stats (R^2 = 0.56), meaning the predictors jointly capture a meaningful amount of variation in Pokemon strength. 
+
+Given these results, we reject the null hypothesis and conclude that harder to catch Pokemon tend to be stronger, consistent with gameplay expectations.
+
+## Discussion
+
+Our findings across all three research questions demonstrate distinct and consistent patterns withing the Pokemon universe that align with both player intuition and formal statistical evidence.
+
+First, we discovered that Pokemon types show significant variations in their statistical distributions. The Random Forest model predicted type about four times better than chance, even though it couldn't perfectly separate them. This suggests that Pokemon types follow certain design patterns, especially when it comes to offensive stats like Special Attack and Attack. This means that stats hold useful information about type identity, which could help players guess battle strengths even if they don't know the type directly. 
+
+Second, we saw that dual-type Pokemon have a big edge over single-type Pokemon when it comes to their total base stats. Both groups have a lot of strengths, but dual-types always have higher averages. This could be because the game designers wanted it that way. Dual typing gives you more strategic options (extra resistance and STAB coverage) and slightly higher stat budgets. These findings highlight the perception that dual-type Pokemon are more versatile and stronger in combat.
+
+Third, our regression analysis showed that Pokemon that are harder to catch tend to have higher total base stats, even after controlling for physical size, sex distribution, and generation. This is very similar to what happens in the game: rare species are usually made to be stronger. Height and weight were also positively correlated with base stats, supporting the notion that larger Pokemon tend to be more powerful. We verified that the inverse correlation between capture rate and combat strength is not merely attributable to variations in size or generation. 
+
+In summary, our results show that Pokemon designs follow certain patterns. Strength is based on more than just typing and whether a Pokemon has one or two types. It also depends on how hard or rate it is to get. These results help explain many things long-time players have noticed, and they do so with clear statistical evidence. From a gameplay point-of-view, these insights can help with team building, strategic planning, and understanding the competition. 
+
+Lastly, our analyses provide strong evidence for these connections, but there are some limitations: some types were underrepresented, making it harder to predict how well they would perform; the dataset also doesn't include battle context variables, like movesets, abilities in action, and held items, that affect the outcome of real fights. Even with these limitations, our study shows how statistical modeling and machine learning can uncover important patterns and "hidden rules" in Pokemon design. 
+
+## References
+
+* Banik, R. (2018). Complete Pokémon Dataset. Kaggle.
+https://www.kaggle.com/datasets/rounakbanik/pokemon
