@@ -9,7 +9,7 @@ As lifelong Pokémon players, our team has always been curious about the fundame
 
 These questions emerged from years of gameplay experience—battling friends, competing online, and building teams without fully understanding the statistical patterns underlying the Pokémon universe. While players often rely on intuition and trial-and-error, we recognized an opportunity to use data science to uncover the hidden structure behind Pokémon design.
 
-Our primary goal is to explore relationships between Pokémon characteristics (type, stats, physical traits, rarity) and combat effectiveness using rigorous statistical methods. Beyond satisfying our curiosity, this project aims to provide actionable insights that can enhance team-building strategies for both casual players and competitive trainers. By analyzing 802 Pokémon across seven generations using classification algorithms, hypothesis testing, and regression modeling, we seek to answer: Can data science reveal the hidden 'rules' that govern Pokémon strength?"
+Our primary goal is to explore relationships between Pokémon characteristics (type, stats, physical traits, rarity) and combat effectiveness using rigorous statistical methods. Beyond satisfying our curiosity, this project aims to provide actionable insights that can enhance team-building strategies for both casual players and competitive trainers. By analyzing 801 Pokémon across seven generations using classification algorithms, hypothesis testing, and regression modeling, we seek to answer: Can data science reveal the hidden 'rules' that govern Pokémon strength?"
 
 
 ## Research Questions
