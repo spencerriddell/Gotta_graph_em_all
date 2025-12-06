@@ -10,7 +10,7 @@ knitr::opts_chunk$set(echo = FALSE)  # important: no results='asis'
 
 ```{r trainers}
 trainers <- data.frame(
-  name   = c("Sergio Ozoria Ramírez (smo2147)", "Maria Beg", "Eman Ibrahim (ei2291)", "Spencer Riddell"),
+  name   = c("Sergio Ozoria Ramírez (smo2147)", "Maria Beg (mb5357)", "Eman Ibrahim (ei2291)", "Spencer Riddell (swr2118)"),
   github = c("sergozoria",               "mb5357",    "ei2291",       "swr2118"),
   avatar = c(
     "https://github.com/sergozoria.png?size=360",
@@ -32,9 +32,23 @@ trainers <- data.frame(
       
       "<strong>Overall Goal:</strong> He wants to become a field researcher to document the diverse Pokémon ecosystem across the Sinnoh region and to uncover the secrets of the region’s legendary Pokémon, including Darkrai, Regigigas, and Heatran.<br><br>",
       
-      "<strong>Contributions:</strong> Project Design, Data Sourcing/Identification, Data Cleaning, Hypothesis Testing, Regression Modeling, Data Analysis, Manuscript/Final Report."
+      "<strong>Contributions:</strong> Project Design, Data Sourcing/Identification, Data Cleaning, Hypothesis Testing, Regression Modeling, Data Interpretation, Manuscript/Final Report Development."
     ),
-    "Add a short bio here (background, interests, role on the project).",
+    paste0(
+  "<strong>Preferred Name:</strong> Maria (she/her)<br>",
+  "<strong>Program:</strong> MPH in Population and Family Health<br>",
+  "<strong>Certificate:</strong> Public Health Research Methods<br>",
+  "<strong>From:</strong> Jubilife City, Sinnoh<br>",
+  "<strong>Starter Pokémon:</strong> Squirtle<br><br>",
+  
+  "<strong>Background:</strong> Growing up in Jubilife City, Maria was captivated by the diversity of Pokémon ecosystems around Sinnoh. From observing wild Pokémon in their habitats to studying their behavior, she developed a passion for exploration and discovery. Her curiosity and analytical mind have made her adept at uncovering patterns in both Pokémon behavior and battle strategy.<br><br>",
+  
+  "<strong>Training Style:</strong> Maria approaches battles like fieldwork—careful observation, strategic planning, and adaptability are key. She relies on type advantages, well-chosen move sets, and clever tactics, preferring Psychic-type Pokémon for their intelligence and versatility.<br><br>",
+  
+  "<strong>Overall Goal:</strong> She aspires to become a Pokémon Explorer, traveling across Sinnoh to document Pokémon habitats, study rare species, and uncover the secrets of legendary Pokémon—all while honing her skills and building a team ready for any challenge.<br><br>",
+  
+  "<strong>Contributions:</strong> Project Design, Exploratory Data Analysis, Hypothesis Testing, Data Interpretation, Regression Modeling, Manuscript/Final Report Development."
+),
     paste0(
   "<strong>Preferred Name:</strong> Eman Ibrahim (she/her)<br>",
   "<strong>Program:</strong> MPH in Epidemiology<br>",
@@ -48,7 +62,7 @@ trainers <- data.frame(
   
   "<strong>Overall Goal:</strong> Eman hopes to become a Pokémon population researcher who studies how environment, rarity, and external pressures shape strength and development. She aims to explore how different regions create different Pokémon outcomes, combining scientific analysis with real-world storytelling to understand the full picture.<br><br>",
   
-  "<strong>Contributions:</strong> Data Cleaning/Peprocessing, Exploratory Data Analysis/Visualization, Hypothesis Testing, Regression Modeling, Data Interpretation, Manuscript/Final Report."),
+  "<strong>Contributions:</strong> Data Cleaning/Peprocessing, Exploratory Data Analysis/Visualization, Hypothesis Testing, Regression Modeling, Data Interpretation, Manuscript/Final Report Development."),
     "Add a short bio here (background, interests, role on the project)."
   ),
   stringsAsFactors = FALSE
