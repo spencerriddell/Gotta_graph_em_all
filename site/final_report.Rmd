@@ -229,7 +229,23 @@ The Welch two-sample t-test showed that dual-type Pokemon have significantly hig
 
 Because the confidence interval does not include zero and the p-value is far below 0.05, we reject the null hypothesis. This means dual-type Pokemon tend to be stronger on average when looking at total base stats.
 
-The violin and boxplots support this conclusion visually: dual-type Pokemon show higher median and a larger cluster of high-stat species, even though both groups have wide variatioin.
+The violin and boxplots support this conclusion visually: dual-type Pokemon show higher median and a larger cluster of high-stat species, even though both groups have wide variation.
+
+**Research Question 3: Does Capture Rate Predict Combat Strength?**
+
+In our multiple linear regression (excluding legendary Pokemon), we found a strong and significant negative association between capture rate and total base stats, even after adjusting for height, weight, percentage male, and generation. 
+
+Key results:
+
+* β = -0.85, p < 0.001
+
+This means that for every 1-unit increase in capture rate (meaning the Pokemon is easier to catch), the `base_total`decrease by about 0.85 points, holding all other variables constant. 
+
+Other covariates (height, weight, and percentage male) were also statistically significant. suggesting that physical characteristics of Pokemon relate to overall combat power. Generation (Modern vs. Early) showed a smaller, borderline effect.
+
+The model explained about 56% of the variance in base stats (R^2 = 0.56), meaning the predictors jointly capture a meaningful amount of variation in Pokemon strength. 
+
+Given these results, we reject the null hypothesis and conclude that harder to catch Pokemon tend to be stronger, consistent with gameplay expectations.
 
 
 ## Discussion
