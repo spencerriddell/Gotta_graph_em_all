@@ -1,7 +1,6 @@
 name: "Gotta Graph ’Em All"
 title: "Gotta Graph ’Em All"
 output_dir: "docs"
-
 navbar:
   left:
     - text: "Home"
