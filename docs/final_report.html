@@ -471,10 +471,9 @@ higher = easier), <code>generation</code> (1-7),
 names to snake_case for consistency. - Treated standard placeholders
 (e.g., blank strings, <code>"NA"</code>, <code>"."</code>) as missing
 values during import.</p>
-<pre class="r"><code>library(tidyverse)</code></pre>
-<pre><code>## Warning: package &#39;ggplot2&#39; was built under R version 4.5.2</code></pre>
-<pre><code>## Warning: package &#39;readr&#39; was built under R version 4.5.2</code></pre>
-<pre class="r"><code># Load raw data and standardize variable names
+<pre class="r"><code>library(tidyverse)
+
+# Load raw data and standardize variable names
 poke_tidy &lt;- read_csv(&quot;./Data/pokemon.csv&quot;, na = c(&quot;NA&quot;, &quot;.&quot;, &quot;&quot;)) |&gt; 
   janitor::clean_names()</code></pre>
 <p><em>Step 2: Type Variable Recoding</em> - Recoded missing
