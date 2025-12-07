@@ -362,26 +362,46 @@ div.tocify {
 <div id="motivation" class="section level2">
 <h2>Motivation</h2>
 <p>As lifelong Pokémon players, our team has always been curious about
-the fundamental questions that drive competitive gameplay: What makes a
-Pokémon strong? How do physical characteristics like height and weight
-relate to combat performance? Which Pokémon types dominate key stats
-such as HP, Attack, and Speed? Do dual-type Pokémon have inherent
-advantages over single-type species?</p>
-<p>These questions emerged from years of gameplay experience—battling
-friends, competing online, and building teams without fully
-understanding the statistical patterns underlying the Pokémon universe.
-While players often rely on intuition and trial-and-error, we recognized
-an opportunity to use data science to uncover the hidden structure
-behind Pokémon design.</p>
+the fundamental questions that shape competitive game-play. After years
+of catching, battling, trading, watching the shows, reading the manga,
+and even playing competitively, we started asking ourselves: What
+actually makes a Pokémon strong? How do physical traits like height and
+weight relate to battle performance? Which types consistently stand out
+in key stats like Attack, Speed, or Defense? And do dual-type Pokémon
+really have advantages over single-type species?</p>
+<p>These questions came from our own experience—building teams,
+experimenting with strategies, and trying to make sense of patterns we
+noticed growing up. Most players rely on intuition or trial-and-error,
+but we wanted to understand whether there are real statistical rules
+behind the Pokémon universe.</p>
 <p>Our primary goal is to explore relationships between Pokémon
-characteristics (type, stats, physical traits, rarity) and combat
-effectiveness using rigorous statistical methods. Beyond satisfying our
-curiosity, this project aims to provide actionable insights that can
-enhance team-building strategies for both casual players and competitive
-trainers. By analyzing 801 Pokémon across seven generations using
-classification algorithms, hypothesis testing, and regression modeling,
-we seek to answer: Can data science reveal the hidden ‘rules’ that
-govern Pokémon strength?”</p>
+characteristics (types, stats, physical traits, rarity) and combat
+effectiveness using data-driven methods. Beyond satisfying our
+curiosity, this project aims to provide insights that can help both
+casual players and competitive trainers. By analyzing 801 Pokémon across
+seven generations using classification models, hypothesis testing, and
+regression, we ask: Can data science reveal the hidden “rules” that
+govern Pokémon strength?</p>
+</div>
+<div id="related-work" class="section level2">
+<h2>Related Work</h2>
+<p>Our project was inspired by our own lived experiences as long-time
+Pokémon fans, as well as the work of the online community that has made
+the franchise easier to explore and understand. Resources like
+<strong><a
+href="https://bulbapedia.bulbagarden.net/wiki/Main_Page">Bulbapedia</a></strong>
+(i.e., a fan-made Pokémon encyclopedia), <strong><a
+href="https://pokemonshowdown.com/">Pokémen Showdown</a></strong> (i.e.,
+a competitive Pokemon battle simulator), and <strong><a
+href="https://pokemondb.net/">Pokémon Database</a></strong> (i.e., a
+comprehensive Pokémon stats and mechanics guide) helped the the
+experience about the franchise.</p>
+<p>Growing up, some of us played every Pokémon game, watched the shows,
+read the manga, and even competed against other players competitively.
+These platforms/resources made the experience more accessible,
+nostalgic, and overall rewarding. All their hard work gave us the
+foundation and curiosity to explore the Pokémon universe through data
+science in this project.</p>
 </div>
 <div id="research-questions" class="section level2">
 <h2>Research Questions</h2>
@@ -456,6 +476,36 @@ containing comprehensive information on <strong>801 Pokémon</strong>
 from Generations 1-7. This dataset includes 41 variables covering base
 stats, types, physical characteristics, battle mechanics, and
 metadata.</p>
+<p>In addition to the original Kaggle variables, our cleaned analytic
+dataset included several new or modified variables created during
+preprocessing:</p>
+<ul>
+<li><code>type1</code> (factor): recoded to title case</li>
+<li><code>type2</code> (factor): missing values recoded to “None”</li>
+<li><code>genderless</code> (logical): TRUE if percentage_male was
+missing</li>
+<li><code>abilities</code> (cleaned): brackets and quotes removed</li>
+<li><code>generation</code> (factor): converted from integer to “Early”
+vs “Modern” for regression models</li>
+<li><code>generation_grp</code> (factor): “Early” (Gen 1–3) vs “Modern”
+(Gen 4–7), used in hypothesis testing</li>
+<li><code>capture_rate</code> (numeric): coerced from character;
+non-numeric values became NA</li>
+<li><code>percentage_male</code> (numeric): coerced from character to
+numeric</li>
+<li><code>dual_type</code> (factor): “Single” if type2 == “None”,
+otherwise “Dual”</li>
+<li><code>base_total</code> (numeric): total stats (hp + attack +
+defense + sp_attack + sp_defense + speed), provided in dataset but used
+as the main outcome</li>
+<li><code>poke_type</code> (subset): cleaned dataset used for Random
+Forest type classification</li>
+<li><code>capture_stats</code> (subset): cleaned dataset for regression
+models, filtered to non-legendary Pokémon with complete data</li>
+</ul>
+<p>These variables allowed us to perform classification, hypothesis
+testing, and multivariable regression using consistent, analysis-ready
+fields.</p>
 <p><strong>Key variables used:</strong></p>
 <ul>
 <li><em>Combat stats:</em> <code>hp</code>, <code>attack</code>,
