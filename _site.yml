@@ -1,3 +1,5 @@
+site: rmarkdown::website 
+
 name: "Gotta Graph ’Em All"
 title: "Gotta Graph ’Em All"
 output_dir: "docs"
@@ -26,3 +28,4 @@ output:
     css: assets/style.css
     includes:
       after_body: assets/footer.html
+

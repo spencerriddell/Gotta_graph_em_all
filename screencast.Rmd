@@ -7,12 +7,27 @@ output:
 
 ```{r, results='asis', echo=FALSE, warning = FALSE}
 library(htmltools)
-tag <- tags$iframe(
-  src = "https://www.youtube.com/embed/qOkz_T-6mEI",
+
+HTML("<h2 style='margin-top:20px;'>Intro Theme — Welcome to Gotta Graph ’Em All</h2>")
+
+tag1 <- tags$iframe(
+  src = "https://www.youtube.com/embed/6xKWiCMKKJg",
   width = "960", height = "540",
-  style = "max-width:100%;border:1px solid #e6e6e6;border-radius:8px;",
+  style = "max-width:100%;border:1px solid #e6e6e6;border-radius:8px;margin-bottom:30px;",
   allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share",
   allowfullscreen = 1
 )
-HTML(as.character(tag))
+HTML(as.character(tag1))
+
+HTML("<h2 style='margin-top:40px;'>Project Screencast — Interactive Website Walkthrough</h2>")
+
+tag2 <- tags$iframe(
+  src = "https://www.youtube.com/embed/qOkz_T-6mEI",
+  width = "960",
+  height = "540",
+  style = "max-width:100%;border:1px solid #e6e6e6;border-radius:8px;margin-top:30px;",
+  allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share",
+  allowfullscreen = 1
+)
+HTML(as.character(tag2))
 ```
