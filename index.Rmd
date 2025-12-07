@@ -29,7 +29,8 @@ hero <- tags$section(
       tags$a(class = "btn-cta btn-cta--primary", href = "eda.html",  "Explore EDA"),
       tags$a(class = "btn-cta btn-cta--primary", href = "analysis.html","Explore Analytics"),
       tags$a(class = "btn-cta btn-cta--primary", href = "final_report.html", "Final Report"),
-      tags$a(class = "btn-cta btn-cta--primary", href = "screencast.html","Screencast")
+      tags$a(class = "btn-cta btn-cta--primary", href = "screencast.html","Screencast"),
+      tags$a(class = "btn-cta btn-cta--primary", href = "contact.html", "Contact Us")
     )
   )
 )

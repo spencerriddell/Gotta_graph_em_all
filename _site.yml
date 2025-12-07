@@ -17,6 +17,8 @@ navbar:
       href: final_report.html
     - text: "Screencast"
       href: screencast.html
+    - text: "Contact"
+      href: contact.html
 
 output:
   html_document:

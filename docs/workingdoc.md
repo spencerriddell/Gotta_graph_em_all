@@ -153,8 +153,8 @@ ggplot(poke_tidy, aes(height_m, weight_kg, color = base_total))+
   labs(title = "Height vs Weight (Colored by total stats")
 ```
 
-    ## Warning: Removed 20 rows containing missing values or values outside the scale
-    ## range (`geom_point()`).
+    ## Warning: Removed 20 rows containing missing values or
+    ## values outside the scale range (`geom_point()`).
 
 <img src="workingdoc_files/figure-gfm/unnamed-chunk-5-1.png" width="90%" />
 
@@ -554,7 +554,8 @@ capture_stats <- poke_tidy |>
 ```
 
     ## Warning: There was 1 warning in `mutate()`.
-    ## ℹ In argument: `capture_rate = as.numeric(capture_rate)`.
+    ## ℹ In argument: `capture_rate =
+    ##   as.numeric(capture_rate)`.
     ## Caused by warning:
     ## ! NAs introduced by coercion
 
