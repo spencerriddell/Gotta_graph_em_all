@@ -10,6 +10,10 @@ library(htmltools)
 
 HTML("<h2 style='margin-top:20px;'>Intro Theme — Welcome to Gotta Graph ’Em All</h2>")
 
+HTML("<p style='font-size:16px; margin-bottom:10px; max-width:820px;'>
+This quick throwback sets the tone for our project, bringing a bit of nostalgia, energy, and a reminder of why we fell in love with Pokémon in the first place. Before diving into the stats and modeling, enjoy the theme that inspired an entire generation of trainers.
+</p>")
+
 tag1 <- tags$iframe(
   src = "https://www.youtube.com/embed/6xKWiCMKKJg",
   width = "960", height = "540",
@@ -20,6 +24,10 @@ tag1 <- tags$iframe(
 HTML(as.character(tag1))
 
 HTML("<h2 style='margin-top:40px;'>Project Screencast — Interactive Website Walkthrough</h2>")
+
+HTML("<p style='font-size:16px; margin-bottom:10px; max-width:820px;'>
+This short video gives an overview of our project website, explaining the data, visualizations, and statistical analyses we created. It’s a fast tour of the interactive tools we built and how to navigate our results.
+</p>")
 
 tag2 <- tags$iframe(
   src = "https://www.youtube.com/embed/qOkz_T-6mEI",
