@@ -2,3 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
+
+# Working files - not part of the published site
+working_files/
