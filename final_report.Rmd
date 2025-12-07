@@ -20,7 +20,7 @@ Our primary goal is to explore relationships between Pokémon characteristics (t
 
 Our project was inspired by our own lived experiences as long-time Pokémon fans, as well as the work of the online community that has made the franchise easier to explore and understand. Resources like **[Bulbapedia](https://bulbapedia.bulbagarden.net/wiki/Main_Page)** (i.e., a fan-made Pokémon encyclopedia), **[Pokémen Showdown](https://pokemonshowdown.com/)** (i.e., a competitive Pokemon battle simulator), and **[Pokémon Database](https://pokemondb.net/)** (i.e., a comprehensive Pokémon stats and mechanics guide) helped shape the experience about the franchise. 
 
-Growing up, some of us played every Pokémon game, watched the shows, read the manga, and even competed against other players competitively. These platforms/resources made the experience more accessible, nostalgic, and overall rewarding. All their hard work gave us the foundation and curiosity to explore the Pokémon universe through data science in this project. 
+Growing up, some of us played every Pokémon game, watched the shows, read the manga, and even competed against other players competitively. These platforms/resources made the experience more accessible, nostalgic, and overall rewarding. All their hard work gave us the foundation and curiosity to explore the Pokémon universe through data science in this project, and, by extension, use them as a guiding framework from the proposal development all through the final report deliverable.
 
 ## Research Questions
 
