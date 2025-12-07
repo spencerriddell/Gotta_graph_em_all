@@ -419,5 +419,7 @@ Lastly, our analyses provide strong evidence for these connections, but there ar
 
 ## References
 
-* Banik, R. (2018). Complete Pokémon Dataset. Kaggle.
-https://www.kaggle.com/datasets/rounakbanik/pokemon
+* Banik, R. (2018). Complete Pokémon Dataset. Kaggle. https://www.kaggle.com/datasets/rounakbanik/pokemon
+* Bulbapedia Community. (n.d.). Bulbapedia [Online encyclopedia]. https://bulbapedia.bulbagarden.net/
+* Pokémon Database. (n.d.). Pokémon Database: Pokédex, stats, mechanics, and game resources. https://pokemondb.net/
+* Pokémon Showdown Development Team. (n.d.). Pokémon Showdown [Online battle simulator]. https://pokemonshowdown.com/
