@@ -8,7 +8,7 @@ Have questions or suggestions? Reach out to the team:
 - Sergio Ozoria Ramírez — GitHub: <https://github.com/sergozoria>
 - Maria Beg — GitHub: <https://github.com/mb5357>
 - Eman Ibrahim — GitHub: <https://github.com/ei2291>
-- Spencer Riddell — GitHub: <https://github.com/swr2118>
+- Spencer Riddell — GitHub: <https://github.com/spencerriddell>
 
 You can also open an issue in our repository:  
 <https://github.com/mb5357/Gotta_graph_em_all/issues>
